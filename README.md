@@ -101,7 +101,7 @@ TypeScript is configured with options that support
 [type stripping](https://nodejs.org/api/typescript.html#type-stripping).
 Beyond this, the TypeScript configuration enables
 `noFallthroughCasesInSwitch`, `noImplicitOverride`, `noImplicitReturns`, and
-`noUncheckedIndexAccess`, which are linter-like properties that don't seem to
+`noUncheckedIndexedAccess`, which are linter-like properties that don't seem to
 be well-supported by typed linting in ESLint.
 
 [Matt Pocock's cheat sheet](https://www.totaltypescript.com/tsconfig-cheat-sheet)
