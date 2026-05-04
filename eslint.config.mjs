@@ -142,7 +142,7 @@ export default defineConfig([
   {
     // Test files may need to make use of the `any` type in a way we want to
     // prevent in normal code.
-    files: ["**/*.{spec,test}.{ts,tsx}", "**/tests"],
+    files: ["**/*.{spec,test}.{ts,tsx}", "**/tests/**"],
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
