@@ -107,7 +107,11 @@ support:
   `--fix` option
 - `npm run prettier` checks formatting, and `npm run prettier:fix` writes
   formatted files back to disk
-- `npm run test` runs Vitest tests and reports coverage
+- `npm run test` runs Vitest tests on the backend (and reports coverage) and
+  runs Playwright end-to-end tests to exercise the frontend and backend
+  together
+- `npm run playwright` runs the Playwright end-to-end tests with the
+  interactive Playwright UI
 - `npm run dev` starts a development server or watch process
 - `npm run build` prepares the project for production-style deployment
 - `npm start` runs the project in production style
