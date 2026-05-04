@@ -119,9 +119,10 @@ export default defineConfig([
         },
       ],
       "@typescript-eslint/restrict-template-expressions": "off", // always allow `${x}` regardless of x's type
+      "@typescript-eslint/no-confusing-void-expression": ["error", { ignoreArrowShorthand: true }], // allow (x) => console.log(x), ban const x = console.log(x)
       "@typescript-eslint/no-unnecessary-condition": "error",
       "@typescript-eslint/no-unsafe-member-access": ["error", { allowOptionalChaining: true }], // optional chaining helps with tests
-      "@typescript-eslint/use-unknown-in-catch-callback-variable": "error",
+      "@typescript-eslint/use-unknown-in-catch-callback-variable": "error", // complements how strict works in typescript for chained promises
     },
   },
   {
