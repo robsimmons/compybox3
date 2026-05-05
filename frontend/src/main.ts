@@ -1,8 +1,5 @@
-import { addGrade, addStudent, getTranscript, ServiceError } from "./service.ts";
+import { addGrade, addStudent, getTranscript, serviceErrorToStr } from "./service.ts";
 import "./style.css";
-
-const serviceErrorToStr = (err: unknown) =>
-  err instanceof ServiceError ? err.message : String(err);
 
 const showNewStudentDiv = document.querySelector<HTMLDivElement>("#showNewStudent")!;
 document.querySelector<HTMLFormElement>("#addStudent")!.onsubmit = (ev) => {
