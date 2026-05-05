@@ -50,7 +50,7 @@ app.post("/api/addGrade", (req, res) => {
   }
 });
 
-/* Handles API requests to retrieve a student transcript */
+/* Handle API requests to retrieve a student transcript */
 const zGetTranscriptBody = z.object({
   password: z.string(),
   studentID: z.int().gte(0),
