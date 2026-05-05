@@ -105,7 +105,7 @@ export async function addGrade(
 }
 
 /* Must be in sync with Transcript from src/types.ts */
-const zTranscript = z.object({
+export const zTranscript = z.object({
   student: z.object({ studentID: z.int(), studentName: z.string() }),
   grades: z.array(z.object({ course: z.string(), grade: z.number() })),
 });
