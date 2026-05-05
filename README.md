@@ -52,8 +52,8 @@ server. You really want your website look like it's _all_ coming from a single
 server during development too.
 
 The easy way to do this is to have the development server _only_ respond to
-API requests, and have the Vite development server forwards all API requests
-to the Express server. This is called "proxying", and it means that you can
+API requests, and have the Vite development server forward all API requests to
+the Express server. This is called "proxying", and it means that you can
 access a complete Vite server from <http://localhost:5173>. (The Vite
 development server needs to know what an API request is: it's configured to
 treat every route starting with `/api` as an API endpoint.)
