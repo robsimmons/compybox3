@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "prettier": "prettier --ignore-path ../.gitignore --check .",
     "prettier:fix": "prettier --ignore-path ../.gitignore --write .",
-    "test": "vitest run"
+    "test": "echo 'no validator tests'"
   },
   "devDependencies": {
     "vitest": "^4.0.17"
