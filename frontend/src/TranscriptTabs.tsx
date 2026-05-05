@@ -10,7 +10,9 @@ const TRANSCRIPT_TABS = [
 ] as const;
 
 export default function TranscriptTabs() {
-  const [currentTab, setCurrentTab] = useState(TRANSCRIPT_TABS[0].key);
+  const [currentTab, setCurrentTab] = useState<(typeof TRANSCRIPT_TABS)[number]["key"]>(
+    TRANSCRIPT_TABS[0].key,
+  );
 
   return (
     <div style={{ marginTop: "1em" }}>
