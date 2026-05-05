@@ -70,9 +70,9 @@ The ESLint configuration makes some assumptions about project structure:
 - Test code lives in a `**/tests` directory OR has a `*.spec.ts(x)` or a
   `*.test.ts(x)` filename. Tests can use devDependencies, unlike other code.
 - Config files all have `*.config.mjs` filenames (vite, vitest, playwright,
-  and eslint all can follow this convention). These can also import
-  devDependencies, unlike other code. This means we're not using TypeScript to
-  check our config files.
+  and eslint all can follow this convention), so we're not using TypeScript to
+  check our config files. Config files can also import devDependencies, like
+  tests but unlike other code.
 - Most everything should be registered as `error`. Warnings don't fail CI
   checks. Exceptions should have a documented reason. Notable exceptions:
   - `no-console` is `warn` because no-console regularly gets turned off by
