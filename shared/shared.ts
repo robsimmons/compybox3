@@ -9,7 +9,10 @@ export const zAddStudentResponse = z.object({ studentID: z.int() });
 export type AddStudentResponse = z.infer<typeof zAddStudentResponse>;
 
 /** Validator for POST `/api/addGrade` responses */
-export const zAddGradeResponse = z.object({ success: z.literal(true) });
+export const zAddGradeResponse = z.discriminatedUnion("success", [
+  z.object({ success: z.literal(true) }),
+  z.object({ success: z.literal(false) }),
+]);
 /** Response type for POST `/api/addGrade` */
 export type AddGradeResponse = z.infer<typeof zAddGradeResponse>;
 
@@ -27,7 +30,7 @@ export const zTranscript = z.object({ student: zStudent, grades: z.array(zCourse
 export type Transcript = z.infer<typeof zTranscript>;
 
 /** Validator for POST `/api/getTranscript` responses */
-export const zGetTranscriptResponse = z.union([
+export const zGetTranscriptResponse = z.discriminatedUnion("success", [
   z.object({ success: z.literal(false) }),
   z.object({ success: z.literal(true), transcript: zTranscript }),
 ]);

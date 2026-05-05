@@ -1,3 +1,11 @@
+import {
+  zAddGradeResponse,
+  zAddStudentResponse,
+  zError,
+  zGetTranscriptResponse,
+  type AddStudentResponse,
+  type GetTranscriptResponse,
+} from "@sourdough/shared";
 import { z } from "zod";
 
 export class ServiceError extends Error {}
@@ -11,8 +19,6 @@ export function serviceErrorToStr(err: unknown) {
   return `Unexpected error: ${err instanceof Error ? err.message : String(err)}`;
 }
 
-const zError = z.object({ error: z.string() });
-
 const zGrade = z
   .string()
   .regex(z.regexes.number)
@@ -25,7 +31,6 @@ const zStudentID = z
   .transform((str) => Number.parseInt(str, 10))
   .pipe(z.int());
 
-const zAddStudentResponse = z.object({ studentID: z.int() });
 /**
  * Validate inputs and call the `addStudent` api
  *
@@ -37,7 +42,7 @@ const zAddStudentResponse = z.object({ studentID: z.int() });
 export async function addStudent(
   password: string,
   studentName: string,
-): Promise<z.infer<typeof zAddStudentResponse>> {
+): Promise<AddStudentResponse> {
   if (studentName === "") throw new ServiceError("Student name must be non-empty");
 
   const response = await fetch("/api/addStudent", {
@@ -53,10 +58,6 @@ export async function addStudent(
   return data;
 }
 
-const zAddGradeResponse = z.discriminatedUnion("success", [
-  z.object({ success: z.literal(true) }),
-  z.object({ success: z.literal(false) }),
-]);
 /**
  * Validate inputs and call the `addGrade` api
  *
@@ -102,20 +103,6 @@ export async function addGrade(
   if (!data.success) throw new ServiceError(`Failed to add grade for this student`);
 }
 
-/* Must be in sync with Transcript from src/types.ts */
-export const zTranscript = z.object({
-  student: z.object({ studentID: z.int(), studentName: z.string() }),
-  grades: z.array(z.object({ course: z.string(), grade: z.number() })),
-});
-
-const zGetTranscriptResponse = z.discriminatedUnion("success", [
-  z.object({ success: z.literal(false) }),
-  z.object({
-    success: z.literal(true),
-    transcript: zTranscript,
-  }),
-]);
-
 /**
  * Validate inputs and call the `getTranscript` API
  *
@@ -127,7 +114,7 @@ const zGetTranscriptResponse = z.discriminatedUnion("success", [
 export async function getTranscript(
   password: string,
   studentIDStr: string,
-): Promise<z.infer<typeof zGetTranscriptResponse>> {
+): Promise<GetTranscriptResponse> {
   const studentID = zStudentID.safeParse(studentIDStr);
   if (!studentID.success) {
     throw new ServiceError("Student ID is invalid");
