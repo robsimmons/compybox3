@@ -36,7 +36,10 @@ export async function addStudent(
   return data;
 }
 
-const zAddGradeResponse = z.object({ success: z.literal(true) });
+const zAddGradeResponse = z.discriminatedUnion("success", [
+  z.object({ success: z.literal(true) }),
+  z.object({ success: z.literal(false) }),
+]);
 /**
  * Validate inputs and call the `addGrade` api
  *
@@ -52,7 +55,7 @@ export async function addGrade(
   studentIDStr: string,
   courseName: string,
   courseGradeStr: string,
-): Promise<z.infer<typeof zAddGradeResponse>> {
+): Promise<void> {
   const studentID = parseInt(studentIDStr);
   if (isNaN(studentID) || `${studentID}` !== studentIDStr || studentID < 0) {
     throw new ServiceError("Student ID is invalid");
@@ -84,7 +87,7 @@ export async function addGrade(
   });
   const data = z.union([zError, zAddGradeResponse]).parse(await response.json());
   if ("error" in data) throw new ServiceError(data.error);
-  return data;
+  if (!data.success) throw new ServiceError(`Could not add grade for student with id ${studentID}`);
 }
 
 const zGetTranscriptResponse = z.union([
