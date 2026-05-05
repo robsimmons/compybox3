@@ -33,16 +33,20 @@ const zAddGradeBody = z.object({
   courseGrade: z.number().gte(0).lte(100),
 });
 app.post("/api/addGrade", (req, res) => {
-  try {
-    const body = zAddGradeBody.parse(req.body);
-    if (!checkPassword(body.password)) {
-      res.status(403).send({ error: "Invalid credentials" });
-    } else {
-      db.addGrade(body.studentID, body.courseName, body.courseGrade);
-      res.send({ success: true });
-    }
-  } catch (e) {
+  const body = zAddGradeBody.safeParse(req.body);
+  if (!body.success) {
     res.status(400).send({ error: "Poorly-formed request" });
+  } else if (!checkPassword(body.data.password)) {
+    res.status(403).send({ error: "Invalid credentials" });
+  } else {
+    let response: { success: true } | { success: false };
+    try {
+      db.addGrade(body.data.studentID, body.data.courseName, body.data.courseGrade);
+      response = { success: true };
+    } catch {
+      response = { success: false };
+    }
+    res.send(response);
   }
 });
 

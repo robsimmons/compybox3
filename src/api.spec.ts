@@ -3,6 +3,9 @@ import supertest, { type Response } from "supertest";
 import { app } from "./app.ts";
 let response: Response;
 
+/** it would be more robust to reset the database explicitly, but this will do. */
+const BAD_STUDENT_ID = 1_000_000_000;
+
 describe(`POST /api/addStudent`, () => {
   it("should allow the addition of a new student", async () => {
     response = await supertest(app)
@@ -40,6 +43,17 @@ describe(`POST /api/addGrade`, () => {
       .send({ password: "password", studentID: id, courseName: "Science", courseGrade: 71 });
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({ success: true });
+  });
+
+  it("should reject the addition of a new grade for a nonexistent student id", async () => {
+    response = await supertest(app).post(`/api/addGrade`).send({
+      password: "password",
+      studentID: BAD_STUDENT_ID,
+      courseName: "Science",
+      courseGrade: 71,
+    });
+    expect(response.status).toBe(200);
+    expect(response.body).toStrictEqual({ success: false });
   });
 
   it("should reject invalid payloads", async () => {
@@ -86,7 +100,7 @@ describe(`POST /api/getTranscript`, () => {
   it("should report failing to get the transcript for a nonexistent student", async () => {
     response = await supertest(app)
       .post(`/api/getTranscript`)
-      .send({ password: "password", studentID: id + 100 + Math.floor(Math.random() * 100000) });
+      .send({ password: "password", studentID: BAD_STUDENT_ID });
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({ success: false });
   });

@@ -1,12 +1,20 @@
 import { z } from "zod";
 
-export class ServiceError extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class ServiceError extends Error {}
 
 const zError = z.object({ error: z.string() });
+
+const zGrade = z
+  .string()
+  .regex(z.regexes.number)
+  .transform((str) => Number.parseFloat(str))
+  .pipe(z.number().gte(0).lte(100));
+
+const zStudentID = z
+  .string()
+  .regex(z.regexes.integer)
+  .transform((str) => Number.parseInt(str, 10))
+  .pipe(z.int());
 
 const zAddStudentResponse = z.object({ studentID: z.int() });
 /**
@@ -36,13 +44,16 @@ export async function addStudent(
   return data;
 }
 
-const zAddGradeResponse = z.object({ success: z.literal(true) });
+const zAddGradeResponse = z.discriminatedUnion("success", [
+  z.object({ success: z.literal(true) }),
+  z.object({ success: z.literal(false) }),
+]);
 /**
  * Validate inputs and call the `addGrade` api
  *
  * @param password - credentials
- * @param studentIDStr - student ID (error if not a positive integer)
- * @param courseName - student name
+ * @param studentIDStr - student ID
+ * @param courseName - course name (can be any non-empty string)
  * @param courseGradeStr - course grade (error if not a number between 0 and 100, inclusive)
  * @returns successful API response
  * @throws if validation fails or there is an API response error
@@ -52,19 +63,14 @@ export async function addGrade(
   studentIDStr: string,
   courseName: string,
   courseGradeStr: string,
-): Promise<z.infer<typeof zAddGradeResponse>> {
-  const studentID = parseInt(studentIDStr);
-  if (isNaN(studentID) || `${studentID}` !== studentIDStr || studentID < 0) {
+): Promise<void> {
+  const studentID = zStudentID.safeParse(studentIDStr);
+  if (!studentID.success) {
     throw new ServiceError("Student ID is invalid");
   }
 
-  const courseGrade = parseFloat(courseGradeStr);
-  if (
-    isNaN(courseGrade) ||
-    `${courseGrade}` !== courseGradeStr ||
-    courseGrade < 0 ||
-    courseGrade > 100
-  ) {
+  const courseGrade = zGrade.safeParse(courseGradeStr);
+  if (!courseGrade.success) {
     throw new ServiceError("Course grade is not valid");
   }
 
@@ -77,24 +83,27 @@ export async function addGrade(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       password,
-      studentID,
+      studentID: studentID.data,
       courseName,
-      courseGrade,
+      courseGrade: courseGrade.data,
     }),
   });
   const data = z.union([zError, zAddGradeResponse]).parse(await response.json());
   if ("error" in data) throw new ServiceError(data.error);
-  return data;
+  if (!data.success) throw new ServiceError(`Failed to add grade for this student`);
 }
 
-const zGetTranscriptResponse = z.union([
+/* Must be in sync with Transcript from src/types.ts */
+const zTranscript = z.object({
+  student: z.object({ studentID: z.int(), studentName: z.string() }),
+  grades: z.array(z.object({ course: z.string(), grade: z.number() })),
+});
+
+const zGetTranscriptResponse = z.discriminatedUnion("success", [
   z.object({ success: z.literal(false) }),
   z.object({
     success: z.literal(true),
-    transcript: z.object({
-      student: z.object({ studentID: z.int(), studentName: z.string() }),
-      grades: z.array(z.object({ course: z.string(), grade: z.number() })),
-    }),
+    transcript: zTranscript,
   }),
 ]);
 
@@ -102,7 +111,7 @@ const zGetTranscriptResponse = z.union([
  * Validate inputs and call the `getTranscript` API
  *
  * @param password - credentials
- * @param studentIDStr - student ID (error if not a positive integer)
+ * @param studentIDStr - student ID
  * @returns successful API response
  * @throws if validation fails or there is an API response error
  */
@@ -110,8 +119,8 @@ export async function getTranscript(
   password: string,
   studentIDStr: string,
 ): Promise<z.infer<typeof zGetTranscriptResponse>> {
-  const studentID = parseInt(studentIDStr);
-  if (isNaN(studentID) || `${studentID}` !== studentIDStr || studentID < 0) {
+  const studentID = zStudentID.safeParse(studentIDStr);
+  if (!studentID.success) {
     throw new ServiceError("Student ID is invalid");
   }
 
@@ -120,7 +129,7 @@ export async function getTranscript(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       password,
-      studentID,
+      studentID: studentID.data,
     }),
   });
   const data = z.union([zError, zGetTranscriptResponse]).parse(await response.json());

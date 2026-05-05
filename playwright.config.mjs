@@ -1,6 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
 
-/* global process */ // TODO: is there a better way to avoid making ESLint angry?
 export default defineConfig({
   // Where the tests live, relative to this file
   testDir: "./frontend/tests/e2e",

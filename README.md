@@ -39,8 +39,8 @@ frontend web development.
 
 However, this means your "frontend code" — the HTML and JS that the browser is
 supposed to run being served by the Vite development web server — is coming
-from a different server than the Express server running in React. The default
-convention is that Vite development web server is accessed via
+from a different server than the Express server that's handling API requests.
+The default convention is that Vite development web server is accessed via
 <http://localhost:5173>, and the Express API server is accessible via
 <http://localhost:3000>. If you try to have a website that is being served
 from a different website than the API service it is using, you're going to
@@ -52,8 +52,8 @@ server. You really want your website look like it's _all_ coming from a single
 server during development too.
 
 The easy way to do this is to have the development server _only_ respond to
-API requests, and have the Vite development server forwards all API requests
-to the Express server. This is called "proxying", and it means that you can
+API requests, and have the Vite development server forward all API requests to
+the Express server. This is called "proxying", and it means that you can
 access a complete Vite server from <http://localhost:5173>. (The Vite
 development server needs to know what an API request is: it's configured to
 treat every route starting with `/api` as an API endpoint.)
@@ -114,7 +114,7 @@ support:
   interactive Playwright UI
 - `npm run dev` starts a development server or watch process
 - `npm run build` prepares the project for production-style deployment
-- `npm start` runs the project in production style
+- `npm start` runs the project in production mode
 
 These are tested by github actions in `.github/workflows/main.yml`.
 
@@ -130,9 +130,9 @@ The ESLint configuration makes some assumptions about project structure:
 - Test code lives in a `**/tests` directory OR has a `*.spec.ts(x)` or a
   `*.test.ts(x)` filename. Tests can use devDependencies, unlike other code.
 - Config files all have `*.config.mjs` filenames (vite, vitest, playwright,
-  and eslint all can follow this convention). These can also import
-  devDependencies, unlike other code. This means we're not using TypeScript to
-  check our config files.
+  and eslint all can follow this convention), so we're not using TypeScript to
+  check our config files. Config files can also import devDependencies, like
+  tests but unlike other code.
 - Most everything should be registered as `error`. Warnings don't fail CI
   checks. Exceptions should have a documented reason. Notable exceptions:
   - `no-console` is `warn` because no-console regularly gets turned off by
@@ -175,7 +175,8 @@ Windows-style `\r\n` line endings (LF instead of CRLF).
 
 ## Project Tree
 
-Different base projects live in a sequence of branches.
+The various Sourdough starters live in a single git repository as a series of
+Git branches that build off of one another.
 
 - [`base`](https://github.com/robsimmons/sourdough/tree/base), the base
   configuration
@@ -194,13 +195,13 @@ GitHub to fork the full-stack React project by just forking this repository.
 
 For other branches, or if you don't want to deal with the weirdness of being a
 forked GitHub project, you'll want to follow a pattern like this, replacing
-the three things in square brackets as needed:
+the three bits in square brackets as needed:
 
 ```sh
 git init
 git branch -M main
 git remote add upstream git@github.com:robsimmons/sourdough.git
-git remote add upstream git@github.com:[MY_USERNAME]/[MY_PROJECT].git
+git remote add origin git@github.com:[MY_USERNAME]/[MY_PROJECT].git
 git fetch upstream
 git merge upstream/[THE_STARTER_YOU_WISH_TO_FORK]
 git push -u origin main
