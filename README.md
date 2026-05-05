@@ -6,11 +6,14 @@ in spring of 2026.
 
 ## Vite+Express Full-stack React Application
 
-This project has two parts:
+This project has three parts, which together form an
+[npm workspaces](https://docs.npmjs.com/cli/v8/using-npm/workspaces) project.
 
-1.  A minimal Express transcript API for a very simple transcript server
+1.  A minimal Express transcript API for a very simple transcript server (in
+    the `./server` directory)
 2.  A Vite frontend for a simple React application that uses the API server
     (this lives in the `./frontend` directory)
+3.  Shared Zod validation and type definitions (in the `./shared` directory)
 
 The way this project runs in "production mode" versus "development mode" is
 very different.

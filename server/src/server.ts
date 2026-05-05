@@ -17,9 +17,9 @@ import express from "express";
 //    matter what you do.
 if (process.env.MODE === "production") {
   // In production mode, we want to serve the frontend code from Express
-  app.use(express.static(path.join(import.meta.dirname, "../frontend/dist")));
+  app.use(express.static(path.join(import.meta.dirname, "../../frontend/dist")));
   app.get(/(.*)/, (req, res) =>
-    res.sendFile(path.join(import.meta.dirname, "../frontend/dist/index.html")),
+    res.sendFile(path.join(import.meta.dirname, "../../frontend/dist/index.html")),
   );
 } else {
   app.get("/", (req, res) => {

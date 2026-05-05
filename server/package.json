@@ -1,0 +1,26 @@
+{
+  "name": "@cs4530-workspaces/server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "check": "tsc",
+    "lint": "eslint .",
+    "prettier": "prettier --ignore-path ../.gitignore --check . ",
+    "prettier:fix": "prettier --ignore-path ../.gitignore --write .",
+    "test": "vitest run --coverage",
+    "dev": "node --watch ./src/server.ts",
+    "start": "MODE=production node ./src/server.ts"
+  },
+  "devDependencies": {
+    "@cs4530-workspaces/shared": "^1.0.0",
+    "@types/express": "^5.0.6",
+    "@types/supertest": "^7.2.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "supertest": "^7.2.2",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "zod": "^4.3.6"
+  }
+}

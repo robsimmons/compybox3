@@ -2,7 +2,7 @@ import express from "express";
 import { z } from "zod";
 import { checkPassword } from "./auth.service.ts";
 import { TranscriptDB } from "./transcript.service.ts";
-import type { Transcript } from "./types.ts";
+import type { Transcript } from "@cs4530-workspaces/shared";
 
 export const app = express();
 app.use(express.json());
