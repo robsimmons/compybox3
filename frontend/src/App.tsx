@@ -1,21 +1,25 @@
-import { useAtom, useAtomValue } from "jotai";
-import { atomWithHash } from "jotai-location";
-import { useEffect } from "react";
+import { Grid, Splitter } from "@chakra-ui/react";
+import { useAtom } from "jotai";
+import { Suspense } from "react";
 
-const a = atomWithHash("a", "hello");
-const c = atomWithHash("c", "goodbye");
+import ChallengePanel from "./ChallengePanel";
+import { solutionAtom } from "./store/params";
+import Verifier from "./Verifier";
 
 export default function App() {
-  const ax = useAtomValue(a);
-  const [cv, setC] = useAtom(c);
-
-  useEffect(() => {
-    setC("addd");
-  }, []);
+  const [solution] = useAtom(solutionAtom);
 
   return (
-    <>
-      {ax}/{cv}
-    </>
+    <Grid h="100vh" templateRows={"min-content 1fr max-content"}>
+      <Grid templateColumns={"max-content 1fr max-content"}></Grid>
+      <Splitter.Root panels={[{ id: "challenge" }, { id: "solution" }]}>
+        <ChallengePanel />
+        <Splitter.ResizeTrigger id="challenge:solution" />
+        <Splitter.Panel id="solution">{solution}</Splitter.Panel>
+      </Splitter.Root>
+      <Suspense fallback={"Loading..."}>
+        <Verifier />
+      </Suspense>
+    </Grid>
   );
 }

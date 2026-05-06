@@ -15,7 +15,7 @@ export async function doWork(data: StartVerifyRequest): Promise<VerifyResult> {
     }
   }
 
-  return { type: "nonstandard-axioms", axioms: ["fake-impl"] };
+  return { type: "verification-failed", output: "Fake" };
 }
 
 const CANNED: [string | RegExp, string | RegExp][] = [
