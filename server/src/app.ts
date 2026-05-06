@@ -1,11 +1,12 @@
 import {
-  zStartVerifyRequest,
-  zVerifyRequest,
   type CheckVerifyResponse,
   type StartVerifyResponse,
+  zStartVerifyRequest,
+  zVerifyRequest,
 } from "@sourdough/shared";
 import express, { type Response } from "express";
 import type { ZodSafeParseResult } from "zod";
+
 import { addWorkToQueue, cancelWork, checkWorkStatus } from "./workqueue.ts";
 
 export const app = express();

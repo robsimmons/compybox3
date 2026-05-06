@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import type { CheckVerifyResponse } from "@sourdough/shared";
 import supertest, { type Response } from "supertest";
+import { describe, expect, it } from "vitest";
 
 import { app } from "./app.ts";
-import type { CheckVerifyResponse } from "@sourdough/shared";
 let response: Response;
 
 describe(`POST /comparator/api/poll`, () => {

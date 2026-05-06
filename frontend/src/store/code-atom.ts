@@ -1,7 +1,6 @@
 import { atom } from "jotai";
-import LZString from "lz-string";
-
 import { atomWithLocation } from "jotai-location";
+import LZString from "lz-string";
 
 /* IMPORTANT:
  * Most of the functionality in this file must exactly match the Live Lean
