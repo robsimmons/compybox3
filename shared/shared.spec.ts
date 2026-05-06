@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { zTranscript } from "./shared.ts";
 
 describe("the Transcript validator", () => {

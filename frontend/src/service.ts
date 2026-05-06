@@ -1,10 +1,10 @@
 import {
+  type AddStudentResponse,
+  type GetTranscriptResponse,
   zAddGradeResponse,
   zAddStudentResponse,
   zError,
   zGetTranscriptResponse,
-  type AddStudentResponse,
-  type GetTranscriptResponse,
 } from "@sourdough/shared";
 import { z } from "zod";
 

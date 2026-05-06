@@ -1,13 +1,13 @@
-import express from "express";
-import { z } from "zod";
-
-import { checkPassword } from "./auth.service.ts";
-import { TranscriptDB } from "./transcript.service.ts";
 import type {
   AddGradeResponse,
   AddStudentResponse,
   GetTranscriptResponse,
 } from "@sourdough/shared";
+import express from "express";
+import { z } from "zod";
+
+import { checkPassword } from "./auth.service.ts";
+import { TranscriptDB } from "./transcript.service.ts";
 
 export const app = express();
 app.use(express.json());
