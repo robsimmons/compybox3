@@ -1,58 +1,98 @@
-import type { CheckVerifyResponse } from "@sourdough/shared";
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 
-import trustedJson from "../../../trusted.json";
-import { challengeAtom } from "./params";
+import { challengeAtom, projectAtom, solutionAtom } from "./params";
+import {
+  zCheckVerifyResponse,
+  zStartVerifyResponse,
+  type CheckVerifyResponse,
+} from "@sourdough/shared";
 
-export type RecognitionState = "working" | "trusted" | "untrusted";
-export const challengeHashAtom = atom(async (get) => {
-  const challenge = get(challengeAtom);
-  const encoder = new TextEncoder();
-  const data = encoder.encode(challenge.trimEnd() + "\n");
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  return [...new Uint8Array(hash)].map((b: number): string => b.toString(16)).join("");
+type VerifierJob = { project: string; challenge: string; solution: string };
+const overrideVerifierJob = atom<VerifierJob | null>(null);
+const defaultVerifierJob = atom<VerifierJob>((get) => ({
+  project: get(projectAtom),
+  challenge: get(challengeAtom),
+  solution: get(solutionAtom),
+}));
+export const verifierJobAtom = atom(
+  (get) => get(overrideVerifierJob) ?? get(defaultVerifierJob),
+  (get, set) => {
+    set(overrideVerifierJob, {
+      project: get(projectAtom),
+      challenge: get(challengeAtom),
+      solution: get(solutionAtom),
+    });
+  },
+);
+
+export const isVerifierSyncedAtom = atom((get) => {
+  const { project, challenge, solution } = get(verifierJobAtom);
+  return (
+    project === get(projectAtom) &&
+    challenge === get(challengeAtom) &&
+    solution === get(solutionAtom)
+  );
 });
 
-export const storeTrustedAtom = atomWithStorage<[string, string][]>(
-  "locallyTrusted",
-  [],
-  undefined,
-  { getOnInit: true },
-);
-export const locallyTrustedAtom = atom(
-  (get) => {
-    const stored = get(storeTrustedAtom);
-    return Object.fromEntries(stored);
-  },
-  (get, set, trusted: { [hash: string]: string }) => {
-    const keys = Object.keys(trusted);
-    set(
-      storeTrustedAtom,
-      keys.map((key) => [key, trusted[key]!]),
-    );
-  },
-);
+type RequestIdResponse = { success: true; requestId: string } | { success: false; message: string };
+export const requestIdAtom = atom<Promise<RequestIdResponse>>(async (get) => {
+  const verifierJob = get(verifierJobAtom);
 
-export interface TrustedChallenge {
-  name: string;
-  sources: string[];
+  const response = await fetch("/comparator/api/start", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(verifierJob),
+  });
+
+  if (response.status !== 200) {
+    return {
+      success: false,
+      message: `unexpected HTTP response from /api/start: ${response.status}`,
+    };
+  }
+
+  const body = zStartVerifyResponse.parse(await response.json());
+  if (body.type === "project-not-supported") {
+    throw new Error(`Current project type not supported`);
+  }
+
+  return { success: true, requestId: body.requestId };
+});
+
+export async function followVerificationJob(
+  requestIdOrFail: RequestIdResponse,
+  setStatus: (status: CheckVerifyResponse) => void,
+  signal: AbortController,
+) {
+  if (!requestIdOrFail.success) {
+    setStatus({ type: "verification-failed", output: requestIdOrFail.message });
+    return;
+  }
+
+  const requestId = requestIdOrFail.requestId;
+
+  for (;;) {
+    await new Promise((resolve) => setTimeout(resolve, 200 * Math.random() * 50));
+    if (signal.signal.aborted) {
+      setStatus({ type: "verification-failed", output: "aborted" });
+      return;
+    }
+
+    const response = await fetch("/comparator/api/poll", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ requestId }),
+    });
+
+    if (response.status !== 200) {
+      setStatus({ type: "verification-failed", output: `poll response ${response.status}` });
+      return;
+    }
+
+    const body = zCheckVerifyResponse.parse(await response.json());
+    setStatus(body);
+    if (body.type !== "in-progress" && body.type !== "in-queue") {
+      return;
+    }
+  }
 }
-const builtInTrusted: { [key: string]: { name: string; sources: string[] } } = trustedJson;
-
-export const recognitionAtom = atom(async (get) => {
-  const challengeHash = await get(challengeHashAtom);
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-
-  const builtInTrust = builtInTrusted[challengeHash];
-  if (builtInTrust) return builtInTrust;
-
-  const locallyTrusted = get(locallyTrustedAtom)[challengeHash];
-  if (locallyTrusted) return { name: locallyTrusted };
-
-  return null;
-});
-
-export const verifStateAtom = atom<
-  null | CheckVerifyResponse | { type: "failure"; message: string }
->(null);

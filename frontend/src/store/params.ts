@@ -44,3 +44,5 @@ export const challengeAtom = codeAtom("challengeUrl", "challenge", "challengez")
  * Synchronize solution code with the hash
  */
 export const solutionAtom = codeAtom("url", "code", "codez");
+
+export const projectAtom = atom("MathlibDemo");
