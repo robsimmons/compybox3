@@ -1,14 +1,13 @@
 import {
+  type CheckVerifyResponse,
   zCheckVerifyResponse,
   zStartVerifyResponse,
-  type CheckVerifyResponse,
 } from "@sourdough/shared";
 import { atom } from "jotai";
+import { atomEffect } from "jotai-effect";
 import { atomWithQuery } from "jotai-tanstack-query";
 
 import { challengeAtom, projectAtom, solutionAtom } from "./params";
-import { atomEffect } from "jotai-effect";
-import type { PrimitiveAtom } from "jotai";
 
 interface ComparatorJobParams {
   internalId: number;
@@ -88,7 +87,7 @@ export const comparatorEffect = atomEffect((get, set) => {
 
   (async () => {
     for (;;) {
-      await new Promise((resolve) => setTimeout(resolve, 200 * Math.random() * 50));
+      await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 50));
       if (controller.signal.aborted) return;
 
       const response = await fetch("/comparator/api/poll", {
