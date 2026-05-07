@@ -1,23 +1,34 @@
-import { atom } from "jotai";
-
-import { challengeAtom, projectAtom, solutionAtom } from "./params";
 import {
   zCheckVerifyResponse,
   zStartVerifyResponse,
   type CheckVerifyResponse,
 } from "@sourdough/shared";
+import { atom } from "jotai";
+import { atomWithQuery } from "jotai-tanstack-query";
 
-type VerifierJob = { project: string; challenge: string; solution: string };
-const overrideVerifierJob = atom<VerifierJob | null>(null);
-const defaultVerifierJob = atom<VerifierJob>((get) => ({
+import { challengeAtom, projectAtom, solutionAtom } from "./params";
+import { atomEffect } from "jotai-effect";
+import type { PrimitiveAtom } from "jotai";
+
+interface ComparatorJobParams {
+  internalId: number;
+  project: string;
+  challenge: string;
+  solution: string;
+}
+let internalIdSequenceNumber = 0;
+const overrideComparatorJob = atom<ComparatorJobParams | null>(null);
+const defaultComparatorJob = atom<ComparatorJobParams>((get) => ({
+  internalId: internalIdSequenceNumber,
   project: get(projectAtom),
   challenge: get(challengeAtom),
   solution: get(solutionAtom),
 }));
-export const verifierJobAtom = atom(
-  (get) => get(overrideVerifierJob) ?? get(defaultVerifierJob),
+export const comparatorJobParamsAtom = atom(
+  (get) => get(overrideComparatorJob) ?? get(defaultComparatorJob),
   (get, set) => {
-    set(overrideVerifierJob, {
+    set(overrideComparatorJob, {
+      internalId: ++internalIdSequenceNumber,
       project: get(projectAtom),
       challenge: get(challengeAtom),
       solution: get(solutionAtom),
@@ -25,8 +36,8 @@ export const verifierJobAtom = atom(
   },
 );
 
-export const isVerifierSyncedAtom = atom((get) => {
-  const { project, challenge, solution } = get(verifierJobAtom);
+export const isComparatorSyncedAtom = atom((get) => {
+  const { project, challenge, solution } = get(comparatorJobParamsAtom);
   return (
     project === get(projectAtom) &&
     challenge === get(challengeAtom) &&
@@ -34,65 +45,113 @@ export const isVerifierSyncedAtom = atom((get) => {
   );
 });
 
-type RequestIdResponse = { success: true; requestId: string } | { success: false; message: string };
-export const requestIdAtom = atom<Promise<RequestIdResponse>>(async (get) => {
-  const verifierJob = get(verifierJobAtom);
+export const comparatorJobIdAtom = atomWithQuery((get) => {
+  const { internalId, project, challenge, solution } = get(comparatorJobParamsAtom);
+  return {
+    queryKey: ["comparator-start", internalId],
+    queryFn: async ({ signal }) => {
+      const response = await fetch("/comparator/api/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project, challenge, solution }),
+        signal,
+      });
+      if (response.status !== 200) throw new Error(`got ${response.status} response on start`);
 
-  const response = await fetch("/comparator/api/start", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(verifierJob),
-  });
+      const body = zStartVerifyResponse.parse(await response.json());
+      if (body.type === "project-not-supported") {
+        throw new Error(`Current project type not supported`);
+      }
 
-  if (response.status !== 200) {
-    return {
-      success: false,
-      message: `unexpected HTTP response from /api/start: ${response.status}`,
-    };
-  }
-
-  const body = zStartVerifyResponse.parse(await response.json());
-  if (body.type === "project-not-supported") {
-    throw new Error(`Current project type not supported`);
-  }
-
-  return { success: true, requestId: body.requestId };
+      return body.requestId;
+    },
+  };
 });
 
-export async function followVerificationJob(
-  requestIdOrFail: RequestIdResponse,
-  setStatus: (status: CheckVerifyResponse) => void,
-  signal: AbortController,
-) {
-  if (!requestIdOrFail.success) {
-    setStatus({ type: "verification-failed", output: requestIdOrFail.message });
+export const comparatorAtom = atom({ type: "in-progress" } as CheckVerifyResponse);
+
+export const comparatorEffect = atomEffect((get, set) => {
+  const { data: requestId, status } = get(comparatorJobIdAtom);
+  if (status === "pending") {
+    set(comparatorAtom, { type: "in-progress" });
+    return;
+  } else if (status === "error") {
+    set(comparatorAtom, {
+      type: "verification-failed",
+      output: `Unexpected error initializing verification`,
+    });
     return;
   }
 
-  const requestId = requestIdOrFail.requestId;
+  // If controller aborts, we mustn't set
+  const controller = new AbortController();
 
-  for (;;) {
-    await new Promise((resolve) => setTimeout(resolve, 200 * Math.random() * 50));
-    if (signal.signal.aborted) {
-      setStatus({ type: "verification-failed", output: "aborted" });
-      return;
+  (async () => {
+    for (;;) {
+      await new Promise((resolve) => setTimeout(resolve, 200 * Math.random() * 50));
+      if (controller.signal.aborted) return;
+
+      const response = await fetch("/comparator/api/poll", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId }),
+        signal: controller.signal,
+      });
+      if (response.status !== 200) throw new Error(`got ${response.status} response on poll`);
+
+      const body = zCheckVerifyResponse.parse(await response.json());
+      if (controller.signal.aborted) return;
+      set(comparatorAtom, body);
+      if (body.type !== "in-progress" && body.type !== "in-queue") return;
     }
+  })().catch((err: unknown) => {
+    if (controller.signal.aborted) return;
+    set(comparatorAtom, {
+      type: "verification-failed",
+      output: `Unexpected error waiting: ${err instanceof Error ? err.message : String(Error)}`,
+    });
+  });
 
-    const response = await fetch("/comparator/api/poll", {
+  return () => {
+    controller.abort();
+    fetch("/comparator/api/cancel", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ requestId }),
-    });
+    }).catch((err: unknown) => console.error(`Unexpected error during cancel`, err));
+  };
+});
 
-    if (response.status !== 200) {
-      setStatus({ type: "verification-failed", output: `poll response ${response.status}` });
-      return;
-    }
+/*
 
-    const body = zCheckVerifyResponse.parse(await response.json());
-    setStatus(body);
-    if (body.type !== "in-progress" && body.type !== "in-queue") {
-      return;
-    }
-  }
-}
+ { type: "verification-failed", output: `Unexpected error waiting: ${err instanceOf Error ? err.message : String(err)}` })export const comparatorAtom = atomWithQuery((get) => {
+  const requestId = get(comparatorJobIdAtom);
+  return {
+    queryKey: ["comparator-run", requestId],
+    queryFn: async ({ signal }) => {
+      for (;;) {
+        await new Promise((resolve) => setTimeout(resolve, 200 * Math.random() * 50));
+        if (signal.aborted) {
+          return { type: "verification-failed", output: "aborted" };
+        }
+
+        const response = await fetch("/comparator/api/poll", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requestId }),
+          signal,
+        });
+
+        if (response.status !== 200) {
+          return { type: "verification-failed", output: `poll response ${response.status}` };
+        }
+
+        const body = zCheckVerifyResponse.parse(await response.json());
+        if (body.type !== "in-progress" && body.type !== "in-queue") {
+          return body;
+        }
+      }
+    },
+  };
+});
+*/

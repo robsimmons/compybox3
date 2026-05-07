@@ -25,8 +25,6 @@ function poorlyFormed<T>(
 }
 
 app.post("/comparator/api/start", (req, res) => {
-  console.log("HELLO");
-  console.log(req.body);
   const body = zStartVerifyRequest.safeParse(req.body);
   if (poorlyFormed(body, res)) return;
 
