@@ -4,3 +4,51 @@
   font-family: monospace;
   margin-top: 1em;
 }
+
+@keyframes popup {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.popsup {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: popup 0.5s;
+  }
+}
+
+@keyframes popup {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.popsup {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: popup 0.5s;
+  }
+}
+
+@keyframes appearance {
+  0% {
+    opacity: 0;
+  }
+  99% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 100%;
+  }
+}
+
+.appears {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: appearance 2s;
+  }
+}

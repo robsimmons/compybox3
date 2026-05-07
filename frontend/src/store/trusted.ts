@@ -4,8 +4,21 @@ import { atomWithStorage } from "jotai/utils";
 import trustedJson from "../../../trusted.json";
 import { challengeAtom } from "./params";
 
-export const challengeHashAtom = atom(async (get) => {
+const CHALLENGE_HASH_MS_DEBOUNCE = 2000;
+
+/**
+ * SHA-256 hashes the challenge (end-trimmed with a trailing newline
+ * re-inserted).
+ *
+ * Uses promises and cancellation to debounce. The debounce is less about
+ * avoiding useless hashes, and more about making the delay before showing a
+ * challenge result look intentional instead of like an unpleasant flicker.
+ */
+export const challengeHashAtom = atom(async (get, { signal }) => {
   const challenge = get(challengeAtom);
+  await new Promise((resolve) => setTimeout(resolve, CHALLENGE_HASH_MS_DEBOUNCE));
+  signal.throwIfAborted();
+
   const encoder = new TextEncoder();
   const data = encoder.encode(challenge.trimEnd() + "\n");
   const hash = await crypto.subtle.digest("SHA-256", data);
@@ -32,28 +45,30 @@ export const locallyTrustedAtom = atom(
   },
 );
 
-export interface TrustedChallenge {
-  name: string;
-  sources: string[];
-}
-const builtInTrusted: { [key: string]: { name: string; sources: string[] } } = trustedJson;
+const builtInTrusted: {
+  [key: string]: {
+    name: string;
+    sources: string[];
+  };
+} = trustedJson;
+
+type TrustRecognition =
+  | { type: "built-in"; name: string; sources: string[] }
+  | { type: "user"; name: string }
+  | { type: "none" };
 
 /**
  * Do we recognize this challenge as one of our trusted challenges, or one of
  * the user's trusted challenges?
- *
- * Imposes an artificial delay delay so that the tiny delay involved in
- * computing a SHA-256 hash doesn't cause screen flicker.
  */
-export const recognitionAtom = atom(async (get) => {
+export const recognitionAtom = atom<Promise<TrustRecognition>>(async (get) => {
   const challengeHash = await get(challengeHashAtom);
-  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const builtInTrust = builtInTrusted[challengeHash];
-  if (builtInTrust) return builtInTrust;
+  if (builtInTrust) return { type: "built-in", ...builtInTrust };
 
   const locallyTrusted = get(locallyTrustedAtom)[challengeHash];
-  if (locallyTrusted) return { name: locallyTrusted };
+  if (locallyTrusted) return { type: "user", name: locallyTrusted };
 
-  return null;
+  return { type: "none" };
 });

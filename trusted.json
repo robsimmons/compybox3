@@ -1,13 +1,13 @@
 {
-  "11779b4b21d2ffe79633c91b70364897e95572fd7f46a7832efcc48c519eff": {
+  "3d139f85ba4e5bb3a21bf1b3c5ee9cfd5268e2f5727af81a7c63f63b0bcf318": {
     "name": "Infinitely Many Primes",
     "sources": ["https://lean-lang.org/"]
   },
-  "25c54673b02121bb2fcb883c77b133f11b166e65b941cb6091ec769a01dec": {
+  "bf60ffd6a011f98e5143a1bd1b48da219274932a1162951369ba25cea191c08f": {
     "name": "Proof of True (trivial to prove)",
     "sources": []
   },
-  "8fa53744c772b881c85ae0c7fbf5b719b3a33b1c68d34fbf3668b39ee71b023": {
+  "b79bf7a94e73c7b7ea9eebd5ac947efa2ccbe5e1b8b38f28ba3a2ff7936bc0": {
     "name": "Proof of False (would imply inconsistency in Lean)",
     "sources": []
   },

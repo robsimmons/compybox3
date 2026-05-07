@@ -16,17 +16,11 @@ interface ComparatorJobParams {
   solution: string;
 }
 let internalIdSequenceNumber = 0;
-const overrideComparatorJob = atom<ComparatorJobParams | null>(null);
-const defaultComparatorJob = atom<ComparatorJobParams>((get) => ({
-  internalId: internalIdSequenceNumber,
-  project: get(projectAtom),
-  challenge: get(challengeAtom),
-  solution: get(solutionAtom),
-}));
+const comparatorJobParamsHolder = atom<ComparatorJobParams | null>(null);
 export const comparatorJobParamsAtom = atom(
-  (get) => get(overrideComparatorJob) ?? get(defaultComparatorJob),
+  (get) => get(comparatorJobParamsHolder),
   (get, set) => {
-    set(overrideComparatorJob, {
+    set(comparatorJobParamsHolder, {
       internalId: ++internalIdSequenceNumber,
       project: get(projectAtom),
       challenge: get(challengeAtom),
@@ -35,24 +29,36 @@ export const comparatorJobParamsAtom = atom(
   },
 );
 
+/** Is the  */
 export const isComparatorSyncedAtom = atom((get) => {
-  const { project, challenge, solution } = get(comparatorJobParamsAtom);
+  const params = get(comparatorJobParamsAtom);
+  if (!params) return false;
   return (
-    project === get(projectAtom) &&
-    challenge === get(challengeAtom) &&
-    solution === get(solutionAtom)
+    params.project === get(projectAtom) &&
+    params.challenge === get(challengeAtom) &&
+    params.solution === get(solutionAtom)
   );
 });
 
 export const comparatorJobIdAtom = atomWithQuery((get) => {
-  const { internalId, project, challenge, solution } = get(comparatorJobParamsAtom);
+  const params = get(comparatorJobParamsAtom);
   return {
-    queryKey: ["comparator-start", internalId],
+    queryKey: ["comparator-start", params?.internalId ?? null],
+    enabled: params !== null,
     queryFn: async ({ signal }) => {
+      if (!params)
+        throw new Error(
+          `invariant violation: queryFn in comparatorJobIdAtom called when query should be disabled`,
+        );
+
       const response = await fetch("/comparator/api/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ project, challenge, solution }),
+        body: JSON.stringify({
+          project: params.project,
+          challenge: params.challenge,
+          solution: params.solution,
+        }),
         signal,
       });
       if (response.status !== 200) throw new Error(`got ${response.status} response on start`);
@@ -82,14 +88,11 @@ export const comparatorEffect = atomEffect((get, set) => {
     return;
   }
 
-  // If controller aborts, we mustn't set
+  // If controller aborts, we mustn't set comparatorAtom
   const controller = new AbortController();
-
   (async () => {
     for (;;) {
       await new Promise((resolve) => setTimeout(resolve, 200 + Math.random() * 50));
-      if (controller.signal.aborted) return;
-
       const response = await fetch("/comparator/api/poll", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -99,7 +102,7 @@ export const comparatorEffect = atomEffect((get, set) => {
       if (response.status !== 200) throw new Error(`got ${response.status} response on poll`);
 
       const body = zCheckVerifyResponse.parse(await response.json());
-      if (controller.signal.aborted) return;
+      controller.signal.throwIfAborted();
       set(comparatorAtom, body);
       if (body.type !== "in-progress" && body.type !== "in-queue") return;
     }
@@ -117,40 +120,7 @@ export const comparatorEffect = atomEffect((get, set) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ requestId }),
+      keepalive: true, // run this to completion if at all possible
     }).catch((err: unknown) => console.error(`Unexpected error during cancel`, err));
   };
 });
-
-/*
-
- { type: "verification-failed", output: `Unexpected error waiting: ${err instanceOf Error ? err.message : String(err)}` })export const comparatorAtom = atomWithQuery((get) => {
-  const requestId = get(comparatorJobIdAtom);
-  return {
-    queryKey: ["comparator-run", requestId],
-    queryFn: async ({ signal }) => {
-      for (;;) {
-        await new Promise((resolve) => setTimeout(resolve, 200 * Math.random() * 50));
-        if (signal.aborted) {
-          return { type: "verification-failed", output: "aborted" };
-        }
-
-        const response = await fetch("/comparator/api/poll", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ requestId }),
-          signal,
-        });
-
-        if (response.status !== 200) {
-          return { type: "verification-failed", output: `poll response ${response.status}` };
-        }
-
-        const body = zCheckVerifyResponse.parse(await response.json());
-        if (body.type !== "in-progress" && body.type !== "in-queue") {
-          return body;
-        }
-      }
-    },
-  };
-});
-*/
