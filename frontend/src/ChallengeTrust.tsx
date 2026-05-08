@@ -54,7 +54,7 @@ export function ChallengeTrust() {
             className="appears"
             onClick={() => {
               const newLocallyTrusted = produce(locallyTrusted, (draft) => {
-                locallyTrusted[challengeHash] = `User-defined trust (hash ${challengeHash})`;
+                draft[challengeHash] = `User-defined trust (hash ${challengeHash})`;
               });
               setLocallyTrusted(newLocallyTrusted);
               alert("Trusting challenge with hash " + challengeHash);
