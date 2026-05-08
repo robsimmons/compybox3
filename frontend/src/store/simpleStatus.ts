@@ -27,6 +27,10 @@ export const simpleStatusAtom = atom((get): SimpleStatus => {
         case "built-in":
           return "success";
         default:
+          // NB: verification success with an untrusted challenge
+          // results in *failure* state, not a warning state (we want
+          // to show red to the user in this case, treating it as
+          // if it's as dangerous as an failed verification)
           return "failure";
       }
     }

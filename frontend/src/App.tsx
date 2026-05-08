@@ -6,8 +6,8 @@ import ChallengePanel from "./ChallengePanel";
 import Header from "./Header";
 import { solutionAtom } from "./store/params";
 import { simpleStatusAtom } from "./store/simpleStatus";
-import Verifier from "./Verifier";
 import { strokeCSS } from "./utils/style";
+import Verifier from "./Verifier";
 
 export default function App() {
   const [solution] = useAtom(solutionAtom);

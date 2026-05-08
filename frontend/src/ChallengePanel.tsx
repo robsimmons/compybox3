@@ -10,14 +10,14 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
+import { faWarning } from "@fortawesome/free-solid-svg-icons/faWarning";
+import { produce } from "immer";
 import { useAtom } from "jotai";
 import { Suspense } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { challengeAtom } from "./store/params";
-import { challengeHashAtom, recognitionAtom } from "./store/trusted";
-import { bgCSS, strokeCSS, type SimpleStatus } from "./utils/style";
-import { faWarning } from "@fortawesome/free-solid-svg-icons/faWarning";
+import { challengeHashAtom, locallyTrustedAtom, recognitionAtom } from "./store/trusted";
+import { bgCSS, type SimpleStatus, strokeCSS } from "./utils/style";
 
 export default function ChallengePanel() {
   const [challenge, setChallenge] = useAtom(challengeAtom);
@@ -55,6 +55,7 @@ export function TrustMessage() {
       : recognition.type === "user"
         ? "warning"
         : "failure";
+  const [locallyTrusted, setLocallyTrusted] = useAtom(locallyTrustedAtom);
 
   return (
     <Grid templateColumns={"1fr max-content"} borderTop={`1px solid ${strokeCSS(recognitionType)}`}>
@@ -70,7 +71,6 @@ export function TrustMessage() {
             <FontAwesomeIcon icon={faWarning} size="sm" color={strokeCSS("failure")} /> Not a known,
             trusted challenge!{" "}
             <Em>It is critical to check for misleading or deceptive content in the challenge.</Em>
-            {challengeHash}
           </Text>
         )}
         {recognition.type === "built-in" && (
@@ -85,10 +85,22 @@ export function TrustMessage() {
             ))}
           </Text>
         )}
+        {recognition.type === "user" && <Text fontSize="sm">{recognition.name}</Text>}
       </Box>
       {recognition.type === "none" && (
         <Box className="popsup" height="100%" backgroundColor={bgCSS(recognitionType)}>
-          <Button className="appears">I trust this challenge</Button>
+          <Button
+            className="appears"
+            onClick={() => {
+              const newLocallyTrusted = produce(locallyTrusted, (draft) => {
+                locallyTrusted[challengeHash] = `User-defined trust (hash ${challengeHash})`;
+              });
+              setLocallyTrusted(newLocallyTrusted);
+              alert("Trusting challenge with hash " + challengeHash);
+            }}
+          >
+            I trust this challenge
+          </Button>
         </Box>
       )}
     </Grid>
