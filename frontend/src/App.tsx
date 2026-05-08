@@ -1,6 +1,5 @@
 import { Grid, Splitter } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
-import { Suspense } from "react";
 
 import ChallengePanel from "./ChallengePanel.tsx";
 import Header from "./Header.tsx";

@@ -10,11 +10,13 @@ const recognitionStateAtom = unwrap(recognitionAtom, () => null);
 export const simpleStatusAtom = atom((get): SimpleStatus => {
   const isComparatorSynced = get(isComparatorSyncedAtom);
   const recognitionState = get(recognitionStateAtom);
-  if (!isComparatorSynced || !recognitionState) return "stale";
+  if (!isComparatorSynced) return "stale";
+  if (!recognitionState) return "working";
 
   const comparator = get(comparatorAtom);
 
   switch (comparator.type) {
+    case "in-preparation":
     case "in-progress":
     case "in-queue": {
       return "working";

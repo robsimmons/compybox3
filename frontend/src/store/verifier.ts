@@ -29,7 +29,7 @@ export const comparatorJobParamsAtom = atom(
   },
 );
 
-/** Is the  */
+/** Is the version of code that's been sent to comparator the code we're looking at? */
 export const isComparatorSyncedAtom = atom((get) => {
   const params = get(comparatorJobParamsAtom);
   if (!params) return false;
@@ -73,14 +73,15 @@ export const comparatorJobIdAtom = atomWithQuery((get) => {
   };
 });
 
-export const comparatorAtom = atom({ type: "in-progress" } as CheckVerifyResponse);
+export const comparatorAtom = atom<CheckVerifyResponse>({ type: "in-preparation" });
 
 export const comparatorEffect = atomEffect((get, set) => {
   const { data: requestId, status } = get(comparatorJobIdAtom);
   if (status === "pending") {
-    set(comparatorAtom, { type: "in-progress" });
+    set(comparatorAtom, { type: "in-preparation" });
     return;
-  } else if (status === "error") {
+  }
+  if (status === "error") {
     set(comparatorAtom, {
       type: "verification-failed",
       output: `Unexpected error initializing verification`,
@@ -110,7 +111,7 @@ export const comparatorEffect = atomEffect((get, set) => {
     if (controller.signal.aborted) return;
     set(comparatorAtom, {
       type: "verification-failed",
-      output: `Unexpected error waiting: ${err instanceof Error ? err.message : String(Error)}`,
+      output: `Unexpected error waiting: ${err instanceof Error ? err.message : String(err)}`,
     });
   });
 

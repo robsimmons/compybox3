@@ -4,7 +4,7 @@ import { atomWithStorage } from "jotai/utils";
 import trustedJson from "../../../trusted.json";
 import { challengeAtom } from "./params.ts";
 
-const CHALLENGE_HASH_MS_DEBOUNCE = 2000;
+const CHALLENGE_HASH_MS_DEBOUNCE = 800;
 
 /**
  * SHA-256 hashes the challenge (end-trimmed with a trailing newline
