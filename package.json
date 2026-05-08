@@ -34,8 +34,5 @@
     "prettier": "^3.7.4",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.57.3"
-  },
-  "dependencies": {
-    "jotai-effect": "^2.2.3"
   }
 }

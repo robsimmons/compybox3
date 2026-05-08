@@ -2,7 +2,7 @@ import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
 import trustedJson from "../../../trusted.json";
-import { challengeAtom } from "./params";
+import { challengeAtom } from "./params.ts";
 
 const CHALLENGE_HASH_MS_DEBOUNCE = 2000;
 

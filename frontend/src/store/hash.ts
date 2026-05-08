@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { atomWithLocation } from "jotai-location";
 
-import { fixedEncodeURIComponent } from "../utils/uri";
+import { fixedEncodeURIComponent } from "../utils/uri.ts";
 
 /**
  * Manage the hash params in a custom way; we slightly differ from the default

@@ -1,16 +1,15 @@
 import { Grid, Splitter } from "@chakra-ui/react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { Suspense } from "react";
 
-import ChallengePanel from "./ChallengePanel";
-import Header from "./Header";
-import { solutionAtom } from "./store/params";
-import { simpleStatusAtom } from "./store/simpleStatus";
-import { strokeCSS } from "./utils/style";
-import Verifier from "./Verifier";
+import ChallengePanel from "./ChallengePanel.tsx";
+import Header from "./Header.tsx";
+import SolutionPanel from "./SolutionPanel.tsx";
+import { simpleStatusAtom } from "./store/simpleStatus.ts";
+import { strokeCSS } from "./utils/style.ts";
+import Verifier from "./Verifier.tsx";
 
 export default function App() {
-  const [solution] = useAtom(solutionAtom);
   const simpleStatus = useAtomValue(simpleStatusAtom);
 
   return (
@@ -22,11 +21,9 @@ export default function App() {
       >
         <ChallengePanel />
         <Splitter.ResizeTrigger id="challenge:solution" />
-        <Splitter.Panel id="solution">{solution}</Splitter.Panel>
+        <SolutionPanel />
       </Splitter.Root>
-      <Suspense fallback={"Loading..."}>
-        <Verifier />
-      </Suspense>
+      <Verifier />
     </Grid>
   );
 }

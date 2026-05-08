@@ -1,16 +1,15 @@
 import { Grid, GridItem, Splitter, Text, Textarea } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { Suspense } from "react";
 
-import { ChallengeTrust } from "./ChallengeTrust.tsx";
-import { challengeAtom } from "./store/params.ts";
+import { solutionAtom } from "./store/params.ts";
 
-export default function ChallengePanel() {
-  const [challenge, setChallenge] = useAtom(challengeAtom);
+export default function SolutionPanel() {
+  const [solution, setSolution] = useAtom(solutionAtom);
+
   return (
-    <Splitter.Panel id="challenge" display="grid" gridTemplateRows="max-content 1fr max-content">
+    <Splitter.Panel id="solution" display="grid" gridTemplateRows="max-content 1fr">
       <Text paddingInline="var(--chakra-spacing-3)" paddingBlock="var(--chakra-spacing-1)">
-        Challenge
+        Solution
       </Text>
       <Grid>
         <GridItem gridArea="1/1" zIndex="1" display="grid">
@@ -18,16 +17,13 @@ export default function ChallengePanel() {
             resize="none"
             fontFamily="monospace"
             border="none"
-            value={challenge}
+            value={solution}
             onChange={(e) => {
-              setChallenge(e.target.value);
+              setSolution(e.target.value);
             }}
           ></Textarea>
         </GridItem>
       </Grid>
-      <Suspense>
-        <ChallengeTrust />
-      </Suspense>
     </Splitter.Panel>
   );
 }

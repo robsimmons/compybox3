@@ -10,8 +10,8 @@ import {
 } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 
-import { simpleStatusAtom } from "./store/simpleStatus";
-import { strokeCSS } from "./utils/style";
+import { simpleStatusAtom } from "./store/simpleStatus.ts";
+import { strokeCSS } from "./utils/style.ts";
 
 const leanConfigs = createListCollection({
   items: [{ label: "Latest Mathlib", value: "MathlibDemo" }],

@@ -7,7 +7,7 @@ import { atom } from "jotai";
 import { atomEffect } from "jotai-effect";
 import { atomWithQuery } from "jotai-tanstack-query";
 
-import { challengeAtom, projectAtom, solutionAtom } from "./params";
+import { challengeAtom, projectAtom, solutionAtom } from "./params.ts";
 
 interface ComparatorJobParams {
   internalId: number;

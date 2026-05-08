@@ -1,9 +1,9 @@
 import { atom } from "jotai";
 import { unwrap } from "jotai/utils";
 
-import type { SimpleStatus } from "../utils/style";
-import { recognitionAtom } from "./trusted";
-import { comparatorAtom, isComparatorSyncedAtom } from "./verifier";
+import type { SimpleStatus } from "../utils/style.ts";
+import { recognitionAtom } from "./trusted.ts";
+import { comparatorAtom, isComparatorSyncedAtom } from "./verifier.ts";
 
 const recognitionStateAtom = unwrap(recognitionAtom, () => null);
 

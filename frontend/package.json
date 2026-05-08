@@ -17,6 +17,7 @@
   "dependencies": {
     "@chakra-ui/react": "^3.35.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.1",
     "@sourdough/shared": "^1.0.0",
     "@tanstack/query-core": "^5.100.9",
     "immer": "^11.1.7",
@@ -30,7 +31,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@fortawesome/react-fontawesome": "^3.3.1",
     "@playwright/test": "^1.58.1",
     "@types/react": "^19.2.13",
     "@types/react-dom": "^19.2.3",
