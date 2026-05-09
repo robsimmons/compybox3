@@ -6,13 +6,13 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import App from "./App.tsx";
-import { comparatorJobParamsAtom } from "./store/verifier.ts";
+import { initializeStore } from "./store/initialize.ts";
 
 const config = defineConfig({});
 
 export const system = createSystem(defaultConfig, config);
 
-getDefaultStore().set(comparatorJobParamsAtom)
+initializeStore(getDefaultStore());
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ChakraProvider value={system}>
