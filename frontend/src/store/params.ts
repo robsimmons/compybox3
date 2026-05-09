@@ -1,10 +1,10 @@
+import { createListCollection } from "@chakra-ui/react";
 import { produce } from "immer";
 import { atom } from "jotai";
 import LZString from "lz-string";
 
 import { toLZCompressedString } from "../utils/compress.ts";
 import { type HashArgs, hashArgsAtom } from "./hash.ts";
-import { createListCollection } from "@chakra-ui/react";
 
 function codeAtom(urlKey: string, plainTextKey: string, compressedKey: string) {
   return atom(

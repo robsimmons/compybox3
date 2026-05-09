@@ -1,14 +1,15 @@
 import type { Store } from "jotai/vanilla/store";
-import { comparatorJobParamsAtom } from "./verifier";
-import { challengeAtom, projectAtom, solutionAtom } from "./params";
 
-const demoChallenge = `def IsPrime (n : Nat) := 1 < n ∧ ∀ k, 1 < k → k < n → ¬ k ∣ n
+import { challengeAtom, projectAtom, solutionAtom } from "./params";
+import { comparatorJobParamsAtom } from "./verifier";
+
+const DEMO_CHALLENGE = `def IsPrime (n : Nat) := 1 < n ∧ ∀ k, 1 < k → k < n → ¬ k ∣ n
 
 theorem InfinitudeOfPrimes : ∀ n, ∃ p > n, IsPrime p := by
   sorry
 `;
 
-const demoSolution = `/-- A prime is a number larger than 1 with no trivial divisors -/
+const DEMO_SOLUTION = `/-- A prime is a number larger than 1 with no trivial divisors -/
 def IsPrime (n : Nat) := 1 < n ∧ ∀ k, 1 < k → k < n → ¬ k ∣ n
 
 /-- Every number larger than 1 has a prime factor -/
@@ -66,8 +67,8 @@ export function initializeStore(store: Store) {
     store.get(solutionAtom) === "" &&
     store.get(projectAtom) === "MathlibDemo"
   ) {
-    store.set(challengeAtom, demoChallenge);
-    store.set(solutionAtom, demoSolution);
+    store.set(challengeAtom, DEMO_CHALLENGE);
+    store.set(solutionAtom, DEMO_SOLUTION);
   }
   store.set(comparatorJobParamsAtom);
 }

@@ -1,8 +1,8 @@
 import { Em, Flex, Grid, GridItem, Portal, Select, Text } from "@chakra-ui/react";
 import { useAtom, useAtomValue } from "jotai";
 
-import { statusClassAtom } from "./store/simpleStatus.ts";
 import { leanConfigs, projectAtom, projectSelectionAtom } from "./store/params.ts";
+import { statusClassAtom } from "./store/simpleStatus.ts";
 
 export default function Header() {
   const statusClass = useAtomValue(statusClassAtom);
