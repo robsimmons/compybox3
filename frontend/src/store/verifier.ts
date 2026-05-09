@@ -83,7 +83,7 @@ export const comparatorJobIdAtom = atomWithQuery((get) => {
  */
 export const comparatorResultAtom = atom<CheckVerifyResponse>({ type: "in-preparation" });
 
-observe((get, set) => {
+export const unobserve = observe((get, set) => {
   const { data: requestId, status, isEnabled } = get(comparatorJobIdAtom);
   if (!isEnabled || status === "pending") {
     // "in-preparation" as the status for `!isEnabled` is justified by

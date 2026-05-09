@@ -10,16 +10,17 @@ import { borderForStatus, type SimpleStatus } from "./utils/style.ts";
 export function ChallengeTrust() {
   const [recognition] = useAtom(recognitionAtom);
   const [challengeHash] = useAtom(challengeHashAtom);
+  const [locallyTrusted, setLocallyTrusted] = useAtom(locallyTrustedAtom);
+
+  // Nothing to say for an empty challenge
+  if (recognition.type === "empty") return null;
+
   const recognitionStatus: SimpleStatus =
     recognition.type === "built-in"
       ? "neutral"
       : recognition.type === "user"
         ? "warning"
         : "failure";
-  const [locallyTrusted, setLocallyTrusted] = useAtom(locallyTrustedAtom);
-
-  // Hash for the empty challenge
-  if (challengeHash === "1ba4719c8b6fe911b091a7c05124b64eeece964e9c058ef8f985daca546b") return null;
 
   return (
     <Grid templateColumns={"1fr max-content"} borderTop={borderForStatus(recognitionStatus)}>

@@ -22,7 +22,9 @@ export const challengeHashAtom = atom(async (get, { signal }) => {
   const encoder = new TextEncoder();
   const data = encoder.encode(challenge.trimEnd() + "\n");
   const hash = await crypto.subtle.digest("SHA-256", data);
-  return [...new Uint8Array(hash)].map((b: number): string => b.toString(16)).join("");
+  return [...new Uint8Array(hash)]
+    .map((b: number): string => b.toString(16).padStart(2, "0"))
+    .join("");
 });
 
 export const storeTrustedAtom = atomWithStorage<[string, string][]>(
@@ -55,13 +57,18 @@ const builtInTrusted: {
 type TrustRecognition =
   | { type: "built-in"; name: string; sources: string[] }
   | { type: "user"; name: string }
-  | { type: "none" };
+  | { type: "none" }
+  | { type: "empty" };
 
 /**
  * Do we recognize this challenge as one of our trusted challenges, or one of
  * the user's trusted challenges?
  */
 export const recognitionAtom = atom<Promise<TrustRecognition>>(async (get) => {
+  if (get(challengeAtom).trim() === "") {
+    return { type: "empty" };
+  }
+  
   const challengeHash = await get(challengeHashAtom);
 
   const builtInTrust = builtInTrusted[challengeHash];
