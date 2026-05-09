@@ -4,7 +4,7 @@ import {
   zStartVerifyResponse,
 } from "@sourdough/shared";
 import { atom } from "jotai";
-import { atomEffect } from "jotai-effect";
+import { observe } from "jotai-effect";
 import { atomWithQuery } from "jotai-tanstack-query";
 
 import { challengeAtom, projectAtom, solutionAtom } from "./params.ts";
@@ -73,16 +73,22 @@ export const comparatorJobIdAtom = atomWithQuery((get) => {
   };
 });
 
-export const comparatorAtom = atom<CheckVerifyResponse>({ type: "in-preparation" });
+/**
+ * The last known output from comparator for the current code. (If
+ * isComparatorSyncedAtom is false, this should not be shown to the user, as
+ * it's out of date!)
+ */
+export const comparatorResultAtom = atom<CheckVerifyResponse>({ type: "in-preparation" });
 
-export const comparatorEffect = atomEffect((get, set) => {
-  const { data: requestId, status } = get(comparatorJobIdAtom);
-  if (status === "pending") {
-    set(comparatorAtom, { type: "in-preparation" });
+observe((get, set) => {
+  const { data: requestId, status, isEnabled } = get(comparatorJobIdAtom);
+  if (!isEnabled || status === "pending") {
+    // "in-preparation" as the status for `!isEnabled` is justified by
+    set(comparatorResultAtom, { type: "in-preparation" });
     return;
   }
   if (status === "error") {
-    set(comparatorAtom, {
+    set(comparatorResultAtom, {
       type: "verification-failed",
       output: `Unexpected error initializing verification`,
     });
@@ -104,12 +110,12 @@ export const comparatorEffect = atomEffect((get, set) => {
 
       const body = zCheckVerifyResponse.parse(await response.json());
       controller.signal.throwIfAborted();
-      set(comparatorAtom, body);
+      set(comparatorResultAtom, body);
       if (body.type !== "in-progress" && body.type !== "in-queue") return;
     }
   })().catch((err: unknown) => {
     if (controller.signal.aborted) return;
-    set(comparatorAtom, {
+    set(comparatorResultAtom, {
       type: "verification-failed",
       output: `Unexpected error waiting: ${err instanceof Error ? err.message : String(err)}`,
     });

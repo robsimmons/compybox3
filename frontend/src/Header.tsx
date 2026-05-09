@@ -1,31 +1,22 @@
-import {
-  createListCollection,
-  Em,
-  Flex,
-  Grid,
-  GridItem,
-  Portal,
-  Select,
-  Text,
-} from "@chakra-ui/react";
-import { useAtomValue } from "jotai";
+import { Em, Flex, Grid, GridItem, Portal, Select, Text } from "@chakra-ui/react";
+import { useAtom, useAtomValue } from "jotai";
 
-import { simpleStatusAtom } from "./store/simpleStatus.ts";
-import { strokeCSS } from "./utils/style.ts";
-
-const leanConfigs = createListCollection({
-  items: [{ label: "Latest Mathlib", value: "MathlibDemo" }],
-});
+import { statusClassAtom } from "./store/simpleStatus.ts";
+import { leanConfigs, projectAtom, projectSelectionAtom } from "./store/params.ts";
 
 export default function Header() {
-  const simpleStatus = useAtomValue(simpleStatusAtom);
+  const statusClass = useAtomValue(statusClassAtom);
+  const [project, setProject] = useAtom(projectAtom);
+  const projectSelection = useAtomValue(projectSelectionAtom);
+
   return (
     <Grid
       templateRows={{ base: "1fr 1fr", md: "1fr" }}
       templateColumns={{ base: "max-content 1fr", md: "max-content 1fr 300px" }}
     >
       <svg
-        style={{ stroke: strokeCSS(simpleStatus), padding: "0.7rem", height: "100%" }}
+        className={statusClass}
+        style={{ padding: "0.7rem", height: "100%" }}
         viewBox="0 0 486 169"
         xmlns="http://www.w3.org/2000/svg"
         fill="transparent"
@@ -37,12 +28,20 @@ export default function Header() {
           strokeLinejoin="round"
         ></path>
       </svg>
-      <Text marginBlock="auto" flexGrow="1" color={strokeCSS(simpleStatus)}>
+      <Text marginBlock="auto" flexGrow="1" className={statusClass}>
         Comparator <Em>(Experimental)</Em>
       </Text>
       <GridItem colSpan={{ base: 2, md: 1 }}>
         <Flex>
-          <Select.Root collection={leanConfigs} defaultValue={["MathlibDemo"]}>
+          <Select.Root
+            collection={leanConfigs}
+            defaultValue={["MathlibDemo"]}
+            value={[projectSelection]}
+            onValueChange={(e) => {
+              if (e.value.length !== 1) return;
+              setProject(e.value[0]!);
+            }}
+          >
             <Select.HiddenSelect />
             <Select.Label hidden={true}>Select Lean Project Configuration</Select.Label>
             <Select.Control>
@@ -56,12 +55,18 @@ export default function Header() {
             <Portal>
               <Select.Positioner>
                 <Select.Content>
-                  {leanConfigs.items.map((leanConfig) => (
-                    <Select.Item item={leanConfig} key={leanConfig.value}>
-                      {leanConfig.label}
-                      <Select.ItemIndicator />
-                    </Select.Item>
-                  ))}
+                  {leanConfigs.items
+                    .filter((leanConfig) => {
+                      return leanConfig.value !== "unknown" || projectSelection === "unknown";
+                    })
+                    .map((leanConfig) => (
+                      <Select.Item item={leanConfig} key={leanConfig.value}>
+                        {leanConfig.value === "unknown"
+                          ? `Unsupported project '${project}'`
+                          : leanConfig.label}
+                        <Select.ItemIndicator />
+                      </Select.Item>
+                    ))}
                 </Select.Content>
               </Select.Positioner>
             </Portal>

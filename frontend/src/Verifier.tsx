@@ -4,30 +4,24 @@ import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
 import { faX } from "@fortawesome/free-solid-svg-icons/faX";
 import { FontAwesomeIcon, type FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 import { useAtomValue, useSetAtom } from "jotai";
-import { type JSX, useEffect } from "react";
+import { type JSX } from "react";
 
-import { simpleStatusAtom } from "./store/simpleStatus.ts";
-import { comparatorAtom, comparatorEffect, comparatorJobParamsAtom } from "./store/verifier.ts";
-import { bgCSS, strokeCSS } from "./utils/style.ts";
+import { statusClassAtom } from "./store/simpleStatus.ts";
+import {
+  comparatorJobParamsAtom,
+  comparatorResultAtom,
+  isComparatorSyncedAtom,
+} from "./store/verifier.ts";
 
 export default function Verifier() {
-  return (
-    <>
-      <VerifyMessage />
-    </>
-  );
-}
-
-export function VerifyMessage() {
-  const simpleStatus = useAtomValue(simpleStatusAtom);
-  const comparator = useAtomValue(comparatorAtom);
+  const statusClass = useAtomValue(statusClassAtom);
+  const isComparatorSynced = useAtomValue(isComparatorSyncedAtom);
+  const comparatorResult = useAtomValue(comparatorResultAtom);
   const reset = useSetAtom(comparatorJobParamsAtom);
-  useAtomValue(comparatorEffect);
-  useEffect(() => reset(), [reset]);
 
   let status: JSX.Element;
   let action: JSX.Element | null;
-  if (simpleStatus === "stale") {
+  if (!isComparatorSynced) {
     status = (
       <Text paddingLeft="3" paddingBlock="1" marginBlock="auto">
         <Strong>Not Verified.</Strong> Press the button to request verification.
@@ -40,7 +34,7 @@ export function VerifyMessage() {
     );
   } else {
     let icon: FontAwesomeIconProps["icon"];
-    switch (comparator.type) {
+    switch (comparatorResult.type) {
       case "in-preparation":
       case "in-progress":
       case "in-queue": {
@@ -83,13 +77,13 @@ export function VerifyMessage() {
         size="3x"
         style={{ padding: "var(--chakra-spacing-3)", marginBlock: "auto" }}
         icon={icon}
-        color={strokeCSS(simpleStatus)}
+        className={statusClass}
       />
     );
   }
 
   return (
-    <Grid backgroundColor={bgCSS(simpleStatus)} templateColumns="1fr max-content">
+    <Grid className={statusClass + "-bg"} templateColumns="1fr max-content">
       {status}
       {action}
     </Grid>

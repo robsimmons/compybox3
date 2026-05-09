@@ -5,12 +5,12 @@ import { produce } from "immer";
 import { useAtom } from "jotai";
 
 import { challengeHashAtom, locallyTrustedAtom, recognitionAtom } from "./store/trusted.ts";
-import { bgCSS, type SimpleStatus, strokeCSS } from "./utils/style.ts";
+import { borderForStatus, type SimpleStatus } from "./utils/style.ts";
 
 export function ChallengeTrust() {
   const [recognition] = useAtom(recognitionAtom);
   const [challengeHash] = useAtom(challengeHashAtom);
-  const recognitionType: SimpleStatus =
+  const recognitionStatus: SimpleStatus =
     recognition.type === "built-in"
       ? "neutral"
       : recognition.type === "user"
@@ -18,19 +18,21 @@ export function ChallengeTrust() {
         : "failure";
   const [locallyTrusted, setLocallyTrusted] = useAtom(locallyTrustedAtom);
 
+  // Hash for the empty challenge
+  if (challengeHash === "1ba4719c8b6fe911b091a7c05124b64eeece964e9c058ef8f985daca546b") return null;
+
   return (
-    <Grid templateColumns={"1fr max-content"} borderTop={`1px solid ${strokeCSS(recognitionType)}`}>
+    <Grid templateColumns={"1fr max-content"} borderTop={borderForStatus(recognitionStatus)}>
       <Box
+        className={`${recognitionStatus}-bg popsup`}
         paddingInline="3"
         paddingBlock="1"
         overflow="hidden"
-        className="popsup"
-        backgroundColor={bgCSS(recognitionType)}
       >
         {recognition.type === "none" && (
           <Text fontSize="sm">
-            <FontAwesomeIcon icon={faWarning} size="sm" color={strokeCSS("failure")} /> Not a known,
-            trusted challenge!{" "}
+            <FontAwesomeIcon icon={faWarning} size="sm" className={recognitionStatus} /> Not a
+            known, trusted challenge!{" "}
             <Em>It is critical to check for misleading or deceptive content in the challenge.</Em>
           </Text>
         )}
@@ -49,7 +51,7 @@ export function ChallengeTrust() {
         {recognition.type === "user" && <Text fontSize="sm">{recognition.name}</Text>}
       </Box>
       {recognition.type === "none" && (
-        <Box className="popsup" height="100%" backgroundColor={bgCSS(recognitionType)}>
+        <Box className={`${recognitionStatus}-bg popsup`} height="100%">
           <Button
             className="appears"
             onClick={() => {

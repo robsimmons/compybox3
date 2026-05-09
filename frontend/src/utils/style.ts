@@ -1,33 +1,16 @@
 export type SimpleStatus = "neutral" | "stale" | "working" | "success" | "warning" | "failure";
 
-export function strokeCSS(st: SimpleStatus) {
+export function borderForStatus(st: SimpleStatus) {
   switch (st) {
     case "failure":
-      return "oklch(0.5654 0.26 27.77)";
+      return "1px solid oklch(0.5654 0.26 27.77)";
     case "success":
-      return "oklch(0.5654 0.1835 262.86)";
+      return "1px solid oklch(0.5654 0.1835 262.86)";
     case "warning":
-      return "oklch(0.6409 0.1251 100)";
+      return "1px solid oklch(0.6409 0.1251 100)";
     case "working":
-      return "oklch(0.5654 0 0)";
     case "stale":
     case "neutral":
-      return "oklch(0.5654 0 0)";
-  }
-}
-
-export function bgCSS(st: SimpleStatus) {
-  switch (st) {
-    case "failure":
-      return "oklch(0.95 0.0321 27.77)";
-    case "success":
-      return "oklch(0.95 0.0233 262.86)";
-    case "warning":
-      return "oklch(0.95 0.0261 100)";
-    case "working":
-      return "oklch(0.95 0 0)";
-    case "stale":
-    case "neutral":
-      return "oklch(0.95 0 0)";
+      return "1px solid oklch(0.5654 0 0)";
   }
 }

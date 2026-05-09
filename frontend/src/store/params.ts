@@ -4,6 +4,7 @@ import LZString from "lz-string";
 
 import { toLZCompressedString } from "../utils/compress.ts";
 import { type HashArgs, hashArgsAtom } from "./hash.ts";
+import { createListCollection } from "@chakra-ui/react";
 
 function codeAtom(urlKey: string, plainTextKey: string, compressedKey: string) {
   return atom(
@@ -45,4 +46,37 @@ export const challengeAtom = codeAtom("challengeUrl", "challenge", "challengez")
  */
 export const solutionAtom = codeAtom("url", "code", "codez");
 
-export const projectAtom = atom("MathlibDemo");
+/**
+ * Chakra options for config
+ */
+export const leanConfigs = createListCollection({
+  items: [
+    { label: "Latest Release", value: "MathlibDemo" },
+    { label: "Stable Release", value: "mathlib-stable" },
+    { label: "Unsupported Project", value: "unknown" },
+  ],
+});
+
+/**
+ * Synchronize project key with the hash
+ */
+export const projectAtom = atom(
+  (get) => {
+    const hashArgs = get(hashArgsAtom);
+    return hashArgs.project ?? "MathlibDemo";
+  },
+  (get, set, project: string) => {
+    const hashArgs = get(hashArgsAtom);
+    set(
+      hashArgsAtom,
+      produce(hashArgs, (draft: HashArgs) => {
+        draft.project = project === "MathlibDemo" ? null : project;
+      }),
+    );
+  },
+);
+
+export const projectSelectionAtom = atom((get) => {
+  const project = get(projectAtom);
+  return leanConfigs.has(project) ? project : "unknown";
+});
