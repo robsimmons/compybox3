@@ -19,7 +19,14 @@ export default function App() {
         panels={[{ id: "challenge" }, { id: "solution" }]}
       >
         <ChallengePanel />
-        <Splitter.ResizeTrigger id="challenge:solution" />
+        <Splitter.ResizeTrigger id="challenge:solution">
+          <Splitter.ResizeTriggerSeparator className={statusClass + "-bg"} color="green" />
+          <Splitter.ResizeTriggerIndicator
+            className={statusClass + "-bg"}
+            border={borderForStatus(statusClass)}
+            color="green"
+          />
+        </Splitter.ResizeTrigger>
         <SolutionPanel />
       </Splitter.Root>
       <Verifier />

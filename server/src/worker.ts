@@ -61,7 +61,7 @@ def factorial : Nat → Nat
   | n+1 => (n + 1) * factorial n
 notation:10000 n "!" => factorial n
 
-/-- The factorial is positive -/
+/-- The factorial is always positive -/
 theorem factorial_pos : ∀ n, 0 < n ! := by
   intro n; induction n <;> grind [factorial]
 

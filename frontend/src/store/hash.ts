@@ -50,7 +50,7 @@ function parseArgs(hash: string): { [key: string]: string } {
           console.error(`Ignoring ill-formed URL arg ${i + 1}: ${s}`);
           return null;
         }
-        return [key, value];
+        return [key, decodeURIComponent(value)];
       })
       .filter((x): x is [string, string] => x !== null),
   );

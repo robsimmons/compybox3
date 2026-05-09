@@ -29,7 +29,10 @@ export const comparatorJobParamsAtom = atom(
   },
 );
 
-/** Is the version of code that's been sent to comparator the code we're looking at? */
+/**
+ * Tracks whether the version of code that's been sent to comparator most
+ * recently is the code we're looking at,
+ */
 export const isComparatorSyncedAtom = atom((get) => {
   const params = get(comparatorJobParamsAtom);
   if (!params) return false;
@@ -84,6 +87,8 @@ observe((get, set) => {
   const { data: requestId, status, isEnabled } = get(comparatorJobIdAtom);
   if (!isEnabled || status === "pending") {
     // "in-preparation" as the status for `!isEnabled` is justified by
+    // immediately kicking off verification in the initializeStore, which will
+    // turn isEnabled true before pretty much anything happens.
     set(comparatorResultAtom, { type: "in-preparation" });
     return;
   }
