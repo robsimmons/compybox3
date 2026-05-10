@@ -21,11 +21,7 @@ export default function App() {
         <ChallengePanel />
         <Splitter.ResizeTrigger id="challenge:solution">
           <Splitter.ResizeTriggerSeparator className={statusClass + "-bg"} color="green" />
-          <Splitter.ResizeTriggerIndicator
-            className={statusClass + "-bg"}
-            border={borderForStatus(statusClass)}
-            color="green"
-          />
+          <Splitter.ResizeTriggerIndicator className={statusClass + "-bg"} />
         </Splitter.ResizeTrigger>
         <SolutionPanel />
       </Splitter.Root>

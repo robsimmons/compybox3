@@ -136,3 +136,7 @@ export const unobserve = observe((get, set) => {
     }).catch((err: unknown) => console.error(`Unexpected error during cancel`, err));
   };
 });
+
+if (import.meta.hot) {
+  import.meta.hot.dispose(unobserve);
+}

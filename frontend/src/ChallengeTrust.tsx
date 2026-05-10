@@ -2,14 +2,14 @@ import { Box, Button, Em, Grid, Link, Span, Text } from "@chakra-ui/react";
 import { faWarning } from "@fortawesome/free-solid-svg-icons/faWarning";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { produce } from "immer";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 import { challengeHashAtom, locallyTrustedAtom, recognitionAtom } from "./store/trusted.ts";
 import { borderForStatus, type SimpleStatus } from "./utils/style.ts";
 
 export function ChallengeTrust() {
-  const [recognition] = useAtom(recognitionAtom);
-  const [challengeHash] = useAtom(challengeHashAtom);
+  const recognition = useAtomValue(recognitionAtom);
+  const challengeHash = useAtomValue(challengeHashAtom);
   const [locallyTrusted, setLocallyTrusted] = useAtom(locallyTrustedAtom);
 
   // Nothing to say for an empty challenge

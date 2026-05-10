@@ -53,11 +53,18 @@
   }
 }
 
+.fa-background {
+  padding-top: var(--chakra-spacing-6);
+}
+
 .failure {
   color: oklch(0.5654 0.26 27.77);
 }
 .failure-bg {
   background-color: oklch(0.95 0.0321 27.77);
+}
+.failure-fa-background {
+  color: oklch(0.8086 0.151 27.77);
 }
 
 .success {
