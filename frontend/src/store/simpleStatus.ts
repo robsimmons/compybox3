@@ -1,11 +1,8 @@
 import { atom } from "jotai";
-import { unwrap } from "jotai/utils";
 
 import { type SimpleStatus } from "../utils/style.ts";
-import { recognitionAtom } from "./trusted.ts";
+import { recognitionStateAtom } from "./trusted.ts";
 import { comparatorResultAtom, isComparatorSyncedAtom } from "./verifier.ts";
-
-const recognitionStateAtom = unwrap(recognitionAtom, () => null);
 
 /**
  * Atom for calculating the current global UI styling.

@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { atomWithStorage, unwrap } from "jotai/utils";
 
 import trustedJson from "../../../trusted.json";
 import { challengeAtom } from "./params.ts";
@@ -68,7 +68,7 @@ export const recognitionAtom = atom<Promise<TrustRecognition>>(async (get) => {
   if (get(challengeAtom).trim() === "") {
     return { type: "empty" };
   }
-  
+
   const challengeHash = await get(challengeHashAtom);
 
   const builtInTrust = builtInTrusted[challengeHash];
@@ -79,3 +79,5 @@ export const recognitionAtom = atom<Promise<TrustRecognition>>(async (get) => {
 
   return { type: "none" };
 });
+
+export const recognitionStateAtom = unwrap(recognitionAtom, () => null);

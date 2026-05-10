@@ -1,10 +1,10 @@
 import { Grid, GridItem, Splitter, Text, Textarea } from "@chakra-ui/react";
+import { faX } from "@fortawesome/free-solid-svg-icons/faX";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAtom, useAtomValue } from "jotai";
 
 import { solutionAtom } from "./store/params.ts";
 import { statusClassAtom } from "./store/simpleStatus.ts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faX } from "@fortawesome/free-solid-svg-icons/faX";
 import { comparatorResultAtom, isComparatorSyncedAtom } from "./store/verifier.ts";
 
 export default function SolutionPanel() {

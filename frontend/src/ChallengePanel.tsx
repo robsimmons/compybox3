@@ -1,18 +1,18 @@
 import { Flex, Grid, GridItem, Splitter, Text, Textarea } from "@chakra-ui/react";
+import { faWarning } from "@fortawesome/free-solid-svg-icons/faWarning";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAtom, useAtomValue } from "jotai";
 import { Suspense } from "react";
 
 import { ChallengeTrust } from "./ChallengeTrust.tsx";
 import { challengeAtom } from "./store/params.ts";
 import { statusClassAtom } from "./store/simpleStatus.ts";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWarning } from "@fortawesome/free-solid-svg-icons/faWarning";
-import { recognitionAtom } from "./store/trusted.ts";
+import { recognitionStateAtom } from "./store/trusted.ts";
 
 export default function ChallengePanel() {
   const [challenge, setChallenge] = useAtom(challengeAtom);
   const statusClass = useAtomValue(statusClassAtom);
-  const recognition = useAtomValue(recognitionAtom);
+  const recognitionState = useAtomValue(recognitionStateAtom);
 
   return (
     <Splitter.Panel id="challenge" display="grid" gridTemplateRows="max-content 1fr max-content">
@@ -20,7 +20,7 @@ export default function ChallengePanel() {
         Challenge
       </Text>
       <Grid>
-        {recognition.type === "empty" && (
+        {challenge.trim() === "" && (
           <GridItem gridArea="1/1" zIndex={0}>
             <Grid templateColumns="min-content 1fr">
               <FontAwesomeIcon
@@ -44,7 +44,7 @@ export default function ChallengePanel() {
             </Grid>
           </GridItem>
         )}
-        {recognition.type === "none" && (
+        {recognitionState?.type === "none" && (
           <GridItem gridArea="1/1" zIndex={0}>
             <FontAwesomeIcon
               icon={faWarning}
