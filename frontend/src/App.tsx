@@ -1,4 +1,4 @@
-import { Grid, Splitter } from "@chakra-ui/react";
+import { Grid, Splitter, useBreakpointValue } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 
 import ChallengePanel from "./ChallengePanel.tsx";
@@ -10,11 +10,16 @@ import Verifier from "./Verifier.tsx";
 
 export default function App() {
   const statusClass = useAtomValue(statusClassAtom);
+  const orientation = useBreakpointValue<"horizontal" | "vertical">({
+    base: "vertical",
+    md: "horizontal",
+  });
 
   return (
     <Grid h="100vh" templateRows={"min-content 1fr max-content"}>
       <Header />
       <Splitter.Root
+        orientation={orientation}
         style={{ borderBlock: borderForStatus(statusClass) }}
         panels={[{ id: "challenge" }, { id: "solution" }]}
       >
