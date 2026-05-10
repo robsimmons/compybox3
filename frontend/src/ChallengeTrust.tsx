@@ -6,9 +6,11 @@ import { useAtom, useAtomValue } from "jotai";
 
 import { challengeHashAtom, locallyTrustedAtom, recognitionAtom } from "./store/trusted.ts";
 import { borderForStatus, type SimpleStatus } from "./utils/style.ts";
+import { challengeAtom } from "./store/params.ts";
 
 export function ChallengeTrust() {
   const recognition = useAtomValue(recognitionAtom);
+  const challenge = useAtomValue(challengeAtom);
   const challengeHash = useAtomValue(challengeHashAtom);
   const [locallyTrusted, setLocallyTrusted] = useAtom(locallyTrustedAtom);
 
@@ -49,7 +51,12 @@ export function ChallengeTrust() {
             ))}
           </Text>
         )}
-        {recognition.type === "user" && <Text fontSize="sm">{recognition.name}</Text>}
+        {recognition.type === "user" && (
+          <Text fontSize="sm">
+            You have previously chosen to trust this challenge in this browser (SHA256{" "}
+            {challengeHash})
+          </Text>
+        )}
       </Box>
       {recognition.type === "none" && (
         <Box className={`${recognitionStatus}-bg popsup`} height="100%">
@@ -57,7 +64,7 @@ export function ChallengeTrust() {
             className="appears"
             onClick={() => {
               const newLocallyTrusted = produce(locallyTrusted, (draft) => {
-                draft[challengeHash] = `User-defined trust (hash ${challengeHash})`;
+                draft[challengeHash] = challenge;
               });
               setLocallyTrusted(newLocallyTrusted);
               alert("Trusting challenge with hash " + challengeHash);

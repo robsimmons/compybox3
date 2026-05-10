@@ -12,11 +12,13 @@ import {
   comparatorResultAtom,
   isComparatorSyncedAtom,
 } from "./store/verifier.ts";
+import { recognitionStateAtom } from "./store/trusted.ts";
 
 export default function Verifier() {
   const statusClass = useAtomValue(statusClassAtom);
   const isComparatorSynced = useAtomValue(isComparatorSyncedAtom);
   const comparatorResult = useAtomValue(comparatorResultAtom);
+  const recognitionState = useAtomValue(recognitionStateAtom);
   const reset = useSetAtom(comparatorJobParamsAtom);
 
   let status: JSX.Element;
@@ -59,8 +61,21 @@ export default function Verifier() {
       case "verification-ok": {
         status = (
           <Box paddingLeft="3" paddingBlock="1" marginBlock="auto">
-            <Strong>Success.</Strong> Lean's kernel verified that the solution proves the claims
-            described in the challenge.
+            <Strong>
+              Success
+              {recognitionState?.type === "none" && "fully validated against untrusted challenge"}
+              {recognitionState?.type === "user" &&
+                "fully validated against locally-trusted challenge"}
+              .
+            </Strong>{" "}
+            Lean's kernel verified that the solution proves the claims described in the challenge
+            {recognitionState?.type === "none" &&
+              ", but it is possible that the challenge does not describe the theorems it appearsg to describe. This usually happens due to subtle oversights in the formalization statement, but it can also be the result of cheap slight-of-hand tricks that use Lean's powerful syntax extensions"}
+            {recognitionState?.type === "user" &&
+              ", and you have chosen to trust that this challenge correctly describes the theorems it purports to describe"}
+            {recognitionState?.type === "built-in" &&
+              ", and the challenge is a known to be trustworthy"}
+            .
           </Box>
         );
         icon = faCheck;
