@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { produce } from "immer";
 import { useAtom, useAtomValue } from "jotai";
 
+import { challengeAtom } from "./store/params.ts";
 import { challengeHashAtom, locallyTrustedAtom, recognitionAtom } from "./store/trusted.ts";
 import { borderForStatus, type SimpleStatus } from "./utils/style.ts";
-import { challengeAtom } from "./store/params.ts";
 
 export function ChallengeTrust() {
   const recognition = useAtomValue(recognitionAtom);

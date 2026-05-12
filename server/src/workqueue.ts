@@ -92,7 +92,7 @@ function drain() {
     jobDb.set(id, { type: "running" });
     runningJobCount++;
     nextServed++;
-    doWork(job.data)
+    doWork(id, job.data)
       .then((result) => {
         // Check for cancellation, which means we don't care anymore
         if (!jobDb.has(id)) return;

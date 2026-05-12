@@ -20,7 +20,7 @@ export const zVerifier = z.enum(["Lean", "Nanoda"]);
 export type Verifier = z.infer<typeof zVerifier>;
 
 const zVerifyPossibilities = [
-  z.object({ type: z.literal("verification-ok") }),
+  z.object({ type: z.literal("verification-ok"), theoremNames: z.array(z.string()) }),
   z.object({ type: z.literal("verification-failed"), output: z.string() }),
   /*
   z.object({ type: z.literal("challenge-fails"), verifier: zVerifier }),
