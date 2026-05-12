@@ -1,6 +1,6 @@
 import type { StartVerifyRequest, VerifyResult } from "@sourdough/shared";
 
-import { collectThms, comparator, compile, createTaskDir } from "./exec.ts";
+import { CheckingError, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
 
 export async function doWork(
   taskId: string,
@@ -17,9 +17,19 @@ export async function doWork(
     await comparator(taskId, theoremNames);
     return { type: "verification-ok", theoremNames };
   } catch (err) {
+    if (err instanceof CheckingError) {
+      return {
+        type: "verification-failed",
+        description: err.message,
+        output: err.output,
+      };
+    }
     return {
       type: "verification-failed",
+      description: "Unexpected error",
       output: err instanceof Error ? err.message : String(err),
     };
+  } finally {
+    
   }
 }

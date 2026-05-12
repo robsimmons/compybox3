@@ -21,8 +21,8 @@ function workingDir(taskId: string, module: string) {
 
 export class CheckingError extends Error {
   output: string;
-  constructor(headline: string, output: string) {
-    super(headline);
+  constructor(description: string, output: string) {
+    super(description);
     this.output = output;
   }
 }
@@ -53,12 +53,12 @@ async function spawnPromise(
   });
 
   await new Promise((resolve, reject) => {
-    proc.on("error", () => {
-      reject(new CheckingError(`${description} failed with an error condition`, output.join("")));
+    proc.on("error", (err) => {
+      reject(new CheckingError(`${description} failed: ${err.message}`, output.join("")));
     });
-    proc.on("close", resolve);
+    proc.on("close", () => resolve(undefined));
   });
-  if (proc.exitCode) {
+  if (proc.exitCode !== 0) {
     throw new CheckingError(
       `${description} returned a non-zero exit code, indicating failure`,
       output.join(""),
@@ -90,7 +90,7 @@ export async function collectThms(taskId: string, project: string) {
     stdout: (str) => stdout.push(str),
   });
 
-  return z.array(z.string()).parse(JSON.parse(stdout.join()));
+  return z.array(z.string()).parse(JSON.parse(stdout.join("")));
 }
 
 export async function compile(
@@ -144,7 +144,7 @@ export async function comparator(taskId: string, theoremNames: string[]) {
   const mvSrc = join(workDir, "..", "Solution", ".lake", "build", "lib", "lean");
   const mvDst = join(workDir, ".lake", "build", "lib", "lean");
   await Promise.all((await readdir(mvSrc)).map((name) => cp(join(mvSrc, name), join(mvDst, name))));
-  await rename(join(workDir, "..", "Solution", "Solution.lean"), join(workDir, "Solution.lean"));
+  await cp(join(workDir, "..", "Solution", "Solution.lean"), join(workDir, "Solution.lean"));
 
   await spawnPromise("lake", ["exe", "comparator", "config.json"], {
     cwd: workDir,

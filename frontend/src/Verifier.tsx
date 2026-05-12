@@ -47,7 +47,8 @@ export default function Verifier() {
   } else if (comparatorResult.type === "verification-failed") {
     status = (
       <Box paddingLeft="3" paddingBlock="1" marginBlock="auto">
-        <Strong>Failed.</Strong> There are problems with this solution.
+        <Strong>Failed.</Strong> There are problems with this solution:{" "}
+        {comparatorResult.description}
       </Box>
     );
     action = (
@@ -64,7 +65,7 @@ export default function Verifier() {
                   <CloseButton />
                 </Dialog.CloseTrigger>
                 <Dialog.Header>
-                  <Dialog.Title>Errors</Dialog.Title>
+                  <Dialog.Title>{comparatorResult.description}</Dialog.Title>
                 </Dialog.Header>
                 <Dialog.Body>
                   <Code as="pre" overflowX="scroll" width="100%">
@@ -107,6 +108,7 @@ export default function Verifier() {
               <>
                 <Strong>
                   Success
+                  {/* transform into "Successfully" if it's a qualified success*/}
                   {recognitionState?.type === "none" &&
                     "fully validated against untrusted challenge"}
                   {recognitionState?.type === "user" &&
@@ -119,11 +121,11 @@ export default function Verifier() {
                   <Code key={name}>{name}</Code>
                 ))}
                 {recognitionState?.type === "none" &&
-                  ", but it is possible that the challenge does not describe the theorems it appearsnpm to describe. This usually happens due to subtle oversights in the formalization statement, but it can also be the result of cheap slight-of-hand tricks that use Lean's powerful syntax extensions"}
+                  ", but it is possible that the challenge does not describe the theorems it appears to describe. This usually happens due to subtle oversights in the formalization statement, but it can also be the result of cheap slight-of-hand tricks that use Lean's powerful syntax extensions"}
                 {recognitionState?.type === "user" &&
                   `, and you have chosen to trust that this challenge correctly describes the theorem${comparatorResult.theoremNames.length > 1 ? "s" : ""} it purports to describe`}
                 {recognitionState?.type === "built-in" &&
-                  ", and the challenge is a known to be trustworthy"}
+                  ", and the challenge is known to be trustworthy"}
                 .
               </>
             )}

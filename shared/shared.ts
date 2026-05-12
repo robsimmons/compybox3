@@ -21,16 +21,11 @@ export type Verifier = z.infer<typeof zVerifier>;
 
 const zVerifyPossibilities = [
   z.object({ type: z.literal("verification-ok"), theoremNames: z.array(z.string()) }),
-  z.object({ type: z.literal("verification-failed"), output: z.string() }),
-  /*
-  z.object({ type: z.literal("challenge-fails"), verifier: zVerifier }),
-  z.object({ type: z.literal("solution-fails"), verifier: zVerifier }),
-  z.object({ type: z.literal("nonstandard-axioms"), axioms: z.array(z.string()) }),
-  z.object({ type: z.literal("solution-missing"), constant: z.string() }),
-  z.object({ type: z.literal("challenge-missing"), constant: z.string() }),
-  z.object({ type: z.literal("constant-mismatch"), constant: z.string() }),
-  z.object({ type: z.literal("other-failure"), message: z.string() }),
-  */
+  z.object({
+    type: z.literal("verification-failed"),
+    description: z.string(),
+    output: z.optional(z.string()),
+  }),
 ] as const;
 export const zVerifyResult = z.discriminatedUnion("type", zVerifyPossibilities);
 export type VerifyResult = z.infer<typeof zVerifyResult>;

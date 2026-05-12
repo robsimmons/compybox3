@@ -5,6 +5,7 @@ import type { CheckVerifyResponse, StartVerifyRequest, VerifyResult } from "@sou
 import { Queue } from "./queue.ts";
 import { doWork } from "./worker.ts";
 
+/** Number of simultaneous processes. Must be 1 in development mode.  */
 const CONCURRENCY = 1;
 let runningJobCount = 0;
 
