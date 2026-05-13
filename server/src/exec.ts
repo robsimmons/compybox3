@@ -65,7 +65,7 @@ async function spawnPromise(
   proc.stderr.on("data", (data) => {
     const str = data instanceof Buffer ? data.toString("utf8") : String(data);
     options?.stderr?.(str);
-    output.push(str);
+    handleStr(str);
   });
 
   await new Promise((resolve, reject) => {
