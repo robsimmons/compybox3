@@ -9,7 +9,7 @@
     "prettier:fix": "prettier --ignore-path ../.gitignore --write .",
     "test": "echo 'e2e tests disabled' # playwright test",
     "dev": "vite",
-    "build": "tsc && vite build && false",
+    "build": "tsc && vite build",
     "playwright": "playwright test --ui"
   },
   "author": "Rob Simmons",
