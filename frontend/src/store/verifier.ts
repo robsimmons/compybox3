@@ -95,7 +95,7 @@ export const unobserve = observe((get, set) => {
   if (status === "error") {
     set(comparatorResultAtom, {
       type: "verification-failed",
-      output: `Unexpected error initializing verification`,
+      description: `Unexpected error initializing verification`,
     });
     return;
   }
@@ -122,7 +122,8 @@ export const unobserve = observe((get, set) => {
     if (controller.signal.aborted) return;
     set(comparatorResultAtom, {
       type: "verification-failed",
-      output: `Unexpected error waiting: ${err instanceof Error ? err.message : String(err)}`,
+      description: `Unexpected error waiting`,
+      output: err instanceof Error ? err.message : String(err),
     });
   });
 

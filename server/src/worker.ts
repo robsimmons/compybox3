@@ -1,20 +1,24 @@
 import type { StartVerifyRequest, VerifyResult } from "@sourdough/shared";
 
-import { CheckingError, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
+import { CheckingError, cleanup, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
+import { doMockWork } from "./mockworker.ts";
 
 export async function doWork(
   taskId: string,
   { project, challenge, solution }: StartVerifyRequest,
 ): Promise<VerifyResult> {
-  await createTaskDir(taskId);
-  const compileChallenge = compile(taskId, project, "Challenge", challenge);
-  const compileSolution = compile(taskId, project, "Solution", solution);
+  if (process.env.USE_MOCK_VERIFICATION) {
+    return doMockWork(challenge, solution);
+  }
 
   try {
-    await Promise.all([compileChallenge, compileSolution]);
+    await createTaskDir(taskId);
+    await Promise.all([
+      compile(taskId, project, "Challenge", challenge),
+      compile(taskId, project, "Solution", solution),
+    ]);
     const theoremNames = await collectThms(taskId, project);
-    console.log(theoremNames);
-    await comparator(taskId, theoremNames);
+    await comparator(taskId, project, theoremNames);
     return { type: "verification-ok", theoremNames };
   } catch (err) {
     if (err instanceof CheckingError) {
@@ -30,6 +34,6 @@ export async function doWork(
       output: err instanceof Error ? err.message : String(err),
     };
   } finally {
-    
+    await cleanup(taskId);
   }
 }

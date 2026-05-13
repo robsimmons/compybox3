@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { cp, mkdir, mkdtemp, readdir, rename, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -15,8 +15,8 @@ export interface VerifyTask {
 const PROJ_ROOT = resolve(process.env.PROJ_ROOT ?? "../Projects");
 export const WORKING_TMP_ROOT_DIR = await mkdtemp(join(tmpdir(), "comparator-"));
 
-function workingDir(taskId: string, module: string) {
-  return join(WORKING_TMP_ROOT_DIR, taskId, module);
+function workingDir(taskId: string) {
+  return join(WORKING_TMP_ROOT_DIR, taskId);
 }
 
 export class CheckingError extends Error {
@@ -26,6 +26,8 @@ export class CheckingError extends Error {
     this.output = output;
   }
 }
+
+const BUFFER_LIMIT = 100_000;
 
 async function spawnPromise(
   command: string,
@@ -40,16 +42,30 @@ async function spawnPromise(
 ) {
   const description = options?.description ?? "Process";
   const proc = spawn(command, args, { cwd: options?.cwd, env: options?.env ?? process.env });
+  let size = 0;
+  let overflow = false;
   const output: string[] = [];
+  const handleStr = (str: string) => {
+    if (overflow) return;
+    if (str.length + size > BUFFER_LIMIT) {
+      overflow = true;
+      output.push(str.slice(0, BUFFER_LIMIT - size) + "\n...clipped...");
+      size = BUFFER_LIMIT;
+    } else {
+      output.push(str);
+      size += str.length;
+    }
+  };
+
   proc.stdout.on("data", (data) => {
-    const str = data instanceof Buffer ? data.toString("utf-8") : String(data);
-    output.push(str);
+    const str = data instanceof Buffer ? data.toString("utf8") : String(data);
     options?.stdout?.(str);
+    handleStr(str);
   });
   proc.stderr.on("data", (data) => {
-    const str = data instanceof Buffer ? data.toString("utf-8") : String(data);
-    output.push(str);
+    const str = data instanceof Buffer ? data.toString("utf8") : String(data);
     options?.stderr?.(str);
+    output.push(str);
   });
 
   await new Promise((resolve, reject) => {
@@ -67,32 +83,26 @@ async function spawnPromise(
   return output.join("");
 }
 
+const staging = (module: string) => `${module}-staging`;
+
 export async function createTaskDir(taskId: string) {
-  await mkdir(join(workingDir(taskId, "Challenge"), ".lake"), { recursive: true });
-  await mkdir(join(workingDir(taskId, "Solution"), ".lake"), { recursive: true });
-  console.log(workingDir(taskId, "Challenge"));
+  await mkdir(join(workingDir(taskId), "Challenge", ".lake"), { recursive: true });
+  await mkdir(join(workingDir(taskId), staging("Challenge")));
+  await mkdir(join(workingDir(taskId), "Solution", ".lake"), { recursive: true });
+  await mkdir(join(workingDir(taskId), staging("Solution")));
 }
 
 function projectDir(project: string) {
   return join(PROJ_ROOT, project);
 }
 
-export async function collectThms(taskId: string, project: string) {
-  const projDir = projectDir(project);
-  const workDir = workingDir(taskId, "Challenge");
+const script = (scriptName: string) => join(import.meta.dirname, "..", "scripts", scriptName);
 
-  await cp(join(projDir, "ChallengeThms.lean"), join(workDir, "ChallengeThms.lean"));
-
-  const stdout: string[] = [];
-  await spawnPromise("lake", ["exe", "challenge-thms"], {
-    cwd: workDir,
-    description: "Challenge theorem collection",
-    stdout: (str) => stdout.push(str),
-  });
-
-  return z.array(z.string()).parse(JSON.parse(stdout.join("")));
-}
-
+/**
+ * Write <module> into the task directory at `$DIR/<module>/<module>.lean`,
+ * and put the artifacts from building the module into
+ * `$DIR/<module>/.lake/build`
+ */
 export async function compile(
   taskId: string,
   project: string,
@@ -100,33 +110,70 @@ export async function compile(
   leanContents: string,
 ) {
   const projDir = projectDir(project);
-  const workDir = workingDir(taskId, module);
+  const workDir = workingDir(taskId);
+  await writeFile(join(workDir, module, module + ".lean"), leanContents);
 
-  await Promise.all([
-    writeFile(join(workDir, module + ".lean"), leanContents),
-    cp(join(projDir, "lake-manifest.json"), join(workDir, "lake-manifest.json")),
-    cp(join(projDir, "lakefile.toml"), join(workDir, "lakefile.toml")),
-    cp(join(projDir, "lean-toolchain"), join(workDir, "lean-toolchain")),
-    symlink(join(projDir, ".lake", "packages"), join(workDir, ".lake", "packages")),
-  ]);
+  let cmd: string;
+  let args: string[];
+  if (process.env.NODE_ENV === "development") {
+    console.error("Running insecure compile without a sandbox", { taskId, project, module });
 
-  await spawnPromise("lake", ["build", module], {
-    cwd: workDir,
+    await Promise.all([
+      cp(join(projDir, "lake-manifest.json"), join(workDir, module, "lake-manifest.json")),
+      cp(join(projDir, "lakefile.toml"), join(workDir, module, "lakefile.toml")),
+      cp(join(projDir, "lean-toolchain"), join(workDir, module, "lean-toolchain")),
+      symlink(join(projDir, ".lake", "packages"), join(workDir, module, ".lake", "packages")),
+    ]);
+
+    cmd = "lake";
+    args = ["build", module];
+  } else {
+    cmd = script("compile.sh");
+    args = [projDir, workDir, module];
+  }
+
+  await spawnPromise(cmd, args, {
+    cwd: join(workDir, module),
     description: `Compilation of olean for ${module}`,
   });
-  /* save leanchecker for later
-  await spawnPromise("lake", ["env", "leanchecker", module], {
-    cwd: workDir,
-    description: `Leanchecker for ${module}`,
-  });
-  */
 }
 
-export async function comparator(taskId: string, theoremNames: string[]) {
-  const workDir = workingDir(taskId, "Challenge");
+export async function collectThms(taskId: string, project: string) {
+  const module = "Challenge";
+  const projDir = projectDir(project);
+  const workDir = workingDir(taskId);
+  const stagingDir = workingDir(taskId);
+
+  let cmd: string;
+  let args: string[];
+  if (process.env.NODE_ENV === "development") {
+    console.error("Running insecure collectThms without a sandbox", { taskId, project });
+
+    await cp(join(projDir, "ChallengeThms.lean"), join(workDir, module, "ChallengeThms.lean"));
+
+    cmd = "lake";
+    args = ["exe", "challenge-thms"];
+  } else {
+    cmd = script("collectThms.sh");
+    args = [projDir, stagingDir];
+  }
+
+  const stdout: string[] = [];
+  await spawnPromise(cmd, args, {
+    cwd: join(workDir, module),
+    description: "Challenge theorem collection",
+    stdout: (str) => stdout.push(str),
+  });
+
+  return z.array(z.string()).parse(JSON.parse(stdout.join("")));
+}
+
+export async function comparator(taskId: string, project: string, theoremNames: string[]) {
+  const projDir = projectDir(project);
+  const workDir = workingDir(taskId);
 
   await writeFile(
-    join(workDir, "config.json"),
+    join(workDir, "Challenge", "config.json"),
     JSON.stringify(
       {
         challenge_module: "Challenge",
@@ -140,19 +187,46 @@ export async function comparator(taskId: string, theoremNames: string[]) {
     ),
   );
 
-  // Move files into place
-  const mvSrc = join(workDir, "..", "Solution", ".lake", "build", "lib", "lean");
-  const mvDst = join(workDir, ".lake", "build", "lib", "lean");
-  await Promise.all((await readdir(mvSrc)).map((name) => cp(join(mvSrc, name), join(mvDst, name))));
-  await cp(join(workDir, "..", "Solution", "Solution.lean"), join(workDir, "Solution.lean"));
+  let cmd: string;
+  let args: string[];
+  let env: { [key: string]: string };
+  if (process.env.NODE_ENV === "development") {
+    console.error("Running insecure comparator without a sandbox", {
+      taskId,
+      project,
+      theoremNames,
+    });
 
-  await spawnPromise("lake", ["exe", "comparator", "config.json"], {
-    cwd: workDir,
-    description: "Comparator",
-    env: {
-      ...process.env,
+    // Move files into place
+    const mvSrc = join(workDir, "Solution", ".lake", "build", "lib", "lean");
+    const mvDst = join(workDir, "Challenge", ".lake", "build", "lib", "lean");
+    await Promise.all(
+      (await readdir(mvSrc)).map((name) => cp(join(mvSrc, name), join(mvDst, name))),
+    );
+    await cp(
+      join(workDir, "Solution", "Solution.lean"),
+      join(workDir, "Challenge", "Solution.lean"),
+    );
+
+    cmd = "lake";
+    args = ["exe", "comparator", "config.json"];
+    env = {
       COMPARATOR_LANDRUN: ".lake/packages/comparator/scripts/fake-landrun.sh",
       COMPARATOR_LEAN4EXPORT: ".lake/packages/lean4export/.lake/build/bin/lean4export",
-    },
+    };
+  } else {
+    cmd = script("comparator.sh");
+    args = [projDir, workDir];
+    env = {};
+  }
+
+  await spawnPromise(cmd, args, {
+    cwd: join(workDir, "Challenge"),
+    description: "Comparator",
+    env: { ...process.env, ...env },
   });
+}
+
+export async function cleanup(taskId: string) {
+  await rm(join(WORKING_TMP_ROOT_DIR, taskId), { recursive: true, force: true });
 }

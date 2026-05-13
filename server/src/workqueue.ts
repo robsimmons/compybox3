@@ -62,7 +62,11 @@ export function checkWorkStatus(id: string): CheckVerifyResponse {
       return { type: "in-progress" };
     case "failed":
       jobDb.delete(id);
-      return { type: "verification-failed", output: job.error };
+      return {
+        type: "verification-failed",
+        description: "Unexpected failure",
+        output: job.error,
+      };
     case "complete":
       jobDb.delete(id);
       return job.result;
