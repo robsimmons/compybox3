@@ -7,6 +7,12 @@
     "server",
     "shared"
   ],
+  "files": [
+    "frontend/dist",
+    "server/scripts",
+    "server/src",
+    "shared"
+  ],
   "scripts": {
     "check": "npm run check --workspaces",
     "lint": "eslint .",

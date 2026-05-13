@@ -2,10 +2,6 @@
   "name": "@comparator/server",
   "version": "1.0.0",
   "type": "module",
-  "files": [
-    "src",
-    "scripts"
-  ],
   "scripts": {
     "check": "tsc",
     "lint": "eslint .",

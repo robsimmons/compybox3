@@ -2,9 +2,6 @@
   "name": "@comparator/frontend",
   "version": "1.0.0",
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "check": "tsc",
     "lint": "eslint .",
