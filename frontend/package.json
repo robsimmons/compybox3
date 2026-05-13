@@ -1,7 +1,6 @@
 {
   "name": "@comparator/frontend",
   "version": "1.0.0",
-  "description": "CS4530 Template",
   "type": "module",
   "files": [
     "dist"
@@ -13,7 +12,7 @@
     "prettier:fix": "prettier --ignore-path ../.gitignore --write .",
     "test": "echo 'e2e tests disabled' # playwright test",
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && false",
     "playwright": "playwright test --ui"
   },
   "author": "Rob Simmons",
