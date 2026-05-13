@@ -17,7 +17,6 @@ LEAN_ROOT="$(lean --print-prefix)"
 
 SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF
-SCRIPT=$(cat <<EOF
 ulimit -t 60       # 60 seconds
 ulimit -v 16777216 # 16gb (includes mmaped things)
 ulimit -u 128      # 128 subprocesses spawnable
