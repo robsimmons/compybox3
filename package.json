@@ -9,8 +9,10 @@
   ],
   "files": [
     "frontend/dist",
+    "frontend/package.json",
     "server/scripts",
     "server/src",
+    "server/package.json",
     "shared"
   ],
   "scripts": {
