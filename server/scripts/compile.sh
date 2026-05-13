@@ -11,6 +11,8 @@ shift
 
 GIT_PATH=$(dirname $(realpath $(which git)))
 DIRNAME_PATH=$(dirname $(realpath $(which dirname)))
+
+cd $PROJECT_DIR
 LEAN_ROOT="$(lean --print-prefix)"
 
 SH=$(realpath $(which sh))

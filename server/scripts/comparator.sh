@@ -11,6 +11,7 @@ GIT_PATH=$(dirname $(realpath $(which git)))
 DIRNAME_PATH=$(dirname $(realpath $(which dirname)))
 WHICH_PATH=$(dirname $(realpath $(which which)))
 
+cd $PROJECT_DIR
 LANDRUN_ROOT=$(realpath "$HOME/landrun")
 LEAN_ROOT="$(lean --print-prefix)"
 
