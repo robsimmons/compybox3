@@ -42,6 +42,7 @@ exec bwrap \
      --setenv COMPARATOR_LANDRUN "/landrun/landrun" \
      --setenv HOME "/tmp" \
      \
+     --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/Challenge/config.json" /project/config.json \
      --ro-bind "$WORK_DIR/Challenge/Challenge.lean" /project/Challenge.lean \
      --ro-bind "$WORK_DIR/Solution/Solution.lean" /project/Solution.lean \
