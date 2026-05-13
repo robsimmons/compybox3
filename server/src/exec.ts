@@ -12,7 +12,7 @@ export interface VerifyTask {
   solution: string;
 }
 
-const PROJ_ROOT = resolve(process.env.PROJ_ROOT ?? "../Projects");
+const PROJ_ROOT = resolve(process.env.COMPARATOR_PROJECT_BASE_PATH ?? "../Projects");
 export const WORKING_TMP_ROOT_DIR = await mkdtemp(join(tmpdir(), "comparator-"));
 console.log("Comparator project root: " + PROJ_ROOT);
 console.log("Comparator working tmp root: " + WORKING_TMP_ROOT_DIR);
