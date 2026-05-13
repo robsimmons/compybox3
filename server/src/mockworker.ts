@@ -1,4 +1,4 @@
-import type { VerifyResult } from "@sourdough/shared";
+import type { VerifyResult } from "@comparator/shared";
 
 /**
  * Mock responses. These will always be sound — we won't report validity for

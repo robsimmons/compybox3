@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import type { CheckVerifyResponse, StartVerifyRequest, VerifyResult } from "@sourdough/shared";
+import type { CheckVerifyResponse, StartVerifyRequest, VerifyResult } from "@comparator/shared";
 
 import { Queue } from "./queue.ts";
 import { doWork } from "./worker.ts";

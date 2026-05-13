@@ -1,4 +1,4 @@
-import type { StartVerifyRequest, VerifyResult } from "@sourdough/shared";
+import type { StartVerifyRequest, VerifyResult } from "@comparator/shared";
 
 import { CheckingError, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
 import { doMockWork } from "./mockworker.ts";

@@ -3,7 +3,7 @@ import {
   type StartVerifyResponse,
   zStartVerifyRequest,
   zVerifyRequest,
-} from "@sourdough/shared";
+} from "@comparator/shared";
 import express, { type Response } from "express";
 import type { ZodSafeParseResult } from "zod";
 

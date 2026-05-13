@@ -2,7 +2,7 @@ import {
   type CheckVerifyResponse,
   zCheckVerifyResponse,
   zStartVerifyResponse,
-} from "@sourdough/shared";
+} from "@comparator/shared";
 import { atom } from "jotai";
 import { observe } from "jotai-effect";
 import { atomWithQuery } from "jotai-tanstack-query";

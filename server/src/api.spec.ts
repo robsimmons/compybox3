@@ -1,4 +1,4 @@
-import type { CheckVerifyResponse } from "@sourdough/shared";
+import type { CheckVerifyResponse } from "@comparator/shared";
 import supertest, { type Response } from "supertest";
 import { describe, expect, it } from "vitest";
 
