@@ -134,6 +134,7 @@ export async function compile(
     args = [projDir, workDir, module];
   }
 
+  console.log("Calling", cmd, args)
   await spawnPromise(cmd, args, {
     cwd: join(workDir, module),
     description: `Compilation of olean for ${module}`,
@@ -160,6 +161,7 @@ export async function collectThms(taskId: string, project: string) {
   }
 
   const stdout: string[] = [];
+  console.log("Calling", cmd, args)
   await spawnPromise(cmd, args, {
     cwd: join(workDir, module),
     description: "Challenge theorem collection",
@@ -221,6 +223,7 @@ export async function comparator(taskId: string, project: string, theoremNames: 
     env = {};
   }
 
+  console.log("Calling", cmd, args)
   await spawnPromise(cmd, args, {
     cwd: join(workDir, "Challenge"),
     description: "Comparator",
