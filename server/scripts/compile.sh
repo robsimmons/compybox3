@@ -40,7 +40,7 @@ exec bwrap \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/$MODULE_NAME/$MODULE_NAME.lean" "/project/$MODULE_NAME.lean" \
-     --overlay-src "$PROJECT_DIR/$MODULE_NAME/.lake/build" \
+     --overlay-src "$PROJECT_DIR/.lake/build" \
      --overlay "$WORK_DIR/$MODULE_NAME/.lake/build" "$WORK_DIR/$MODULE_NAME-staging" /project/.lake/build \
      \
      --unshare-all \

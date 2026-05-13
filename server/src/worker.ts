@@ -1,6 +1,6 @@
 import type { StartVerifyRequest, VerifyResult } from "@sourdough/shared";
 
-import { CheckingError, cleanup, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
+import { CheckingError, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
 import { doMockWork } from "./mockworker.ts";
 
 export async function doWork(
@@ -34,6 +34,7 @@ export async function doWork(
       output: err instanceof Error ? err.message : String(err),
     };
   } finally {
-    await cleanup(taskId);
+    // XXX TURN THIS ONE ONCE WE'VE DEBUGGED STUFF
+    // await cleanup(taskId);
   }
 }

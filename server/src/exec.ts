@@ -14,6 +14,8 @@ export interface VerifyTask {
 
 const PROJ_ROOT = resolve(process.env.PROJ_ROOT ?? "../Projects");
 export const WORKING_TMP_ROOT_DIR = await mkdtemp(join(tmpdir(), "comparator-"));
+console.log("Comparator project root: " + PROJ_ROOT);
+console.log("Comparator working tmp root: " + WORKING_TMP_ROOT_DIR);
 
 function workingDir(taskId: string) {
   return join(WORKING_TMP_ROOT_DIR, taskId);
@@ -142,7 +144,6 @@ export async function collectThms(taskId: string, project: string) {
   const module = "Challenge";
   const projDir = projectDir(project);
   const workDir = workingDir(taskId);
-  const stagingDir = workingDir(taskId);
 
   let cmd: string;
   let args: string[];
@@ -155,7 +156,7 @@ export async function collectThms(taskId: string, project: string) {
     args = ["exe", "challenge-thms"];
   } else {
     cmd = script("collectThms.sh");
-    args = [projDir, stagingDir];
+    args = [projDir, workDir];
   }
 
   const stdout: string[] = [];

@@ -21,8 +21,8 @@ exec /lean/bin/lake exe challenge-thms
 EOF                                                                                                                                         
 )
 
-mkdir -p $WORK_DIR/Collectthms
-mkdir -p $WORK_DIR/Collectthms-staging
+mkdir -p $WORK_DIR/ChallengeThms
+mkdir -p $WORK_DIR/ChallengeThms-staging
 exec bwrap \
      --ro-bind /nix /nix \
      --ro-bind "$LEAN_ROOT" /lean \
@@ -39,7 +39,7 @@ exec bwrap \
      --ro-bind "$WORK_DIR/Challenge/Challenge.lean" /project/Challenge.lean \
      --overlay-src "$WORK_DIR/Challenge/.lake/build" \
      --overlay-src "$PROJECT_DIR/.lake/build" \
-     --overlay "$WORK_DIR/Collectthms" "$WORK_DIR/Collectthms-staging" /project/.lake/build \
+     --overlay "$WORK_DIR/ChallengeThms" "$WORK_DIR/ChallengeThms-staging" /project/.lake/build \
      \
      --unshare-all \
      --new-session \

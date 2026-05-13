@@ -21,6 +21,10 @@ lines in bubblewrap)
 The extra nice thing here is that comparator can be called on a _completely
 read only filesystem_
 
+To document better:
+
+assumes landrun is at $HOME/landrun/landrun
+
 ## Vite+Express Full-stack React Application with Workspaces
 
 This project has three parts, which together form an
