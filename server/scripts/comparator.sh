@@ -22,7 +22,7 @@ ulimit -v 16777216 # 16gb (includes mmaped things)
 ulimit -u 128      # 128 subprocesses spawnable                                                                                             
 ulimit -f 524288   # File output size limits                                                                                                
 exec /lean/bin/lake exe comparator config.json                                                                                              
-EOF                                                                                                                                         
+EOF
 )
 
 mkdir -p "$WORK_DIR/Comparator"
