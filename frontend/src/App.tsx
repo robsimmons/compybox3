@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, Splitter, Text, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Flex, Grid, GridItem, Splitter, Text, useBreakpointValue } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 
 import ChallengePanel from "./ChallengePanel.tsx";
@@ -21,43 +21,44 @@ export default function App() {
   return (
     <Grid h="100vh" templateRows={"min-content 1fr max-content"}>
       <Header />
-      <GridItem gridArea="2/1">
-        <Splitter.Root
-          orientation={orientation}
-          style={{ borderBlock: borderForStatus(statusClass) }}
-          panels={[{ id: "challenge" }, { id: "solution" }]}
+      <GridItem position="relative">
+        <Box
+          position="relative"
+          width="100%"
+          height="100%"
+          opacity={projectSelection === "unknown" ? 0.35 : 1}
+          inert={projectSelection === "unknown"}
         >
-          <ChallengePanel />
-          <Splitter.ResizeTrigger id="challenge:solution">
-            <Splitter.ResizeTriggerSeparator className={statusClass + "-bg"} />
-            <Splitter.ResizeTriggerIndicator className={statusClass + "-bg"} />
-          </Splitter.ResizeTrigger>
-          <SolutionPanel />
-        </Splitter.Root>
-      </GridItem>
-      {projectSelection === "unknown" && (
-        <GridItem
-          display="flex"
-          justifyContent="center"
-          alignContent="center"
-          gridArea="2/1"
-          zIndex={99}
-          backgroundColor={"rgba(255,255,255,50%)"}
-        >
-          <Box
-            backgroundColor="white"
-            padding="3"
-            border="3px solid black"
-            borderRadius="1rem"
-            maxWidth="50%"
-            height="min-content"
-            margin="auto"
+          <Splitter.Root
+            orientation={orientation}
+            style={{ borderBlock: borderForStatus(statusClass) }}
+            panels={[{ id: "challenge" }, { id: "solution" }]}
           >
-            <Text>Comparator Live does not support the project '{project}'</Text>
-            <Text>Select a different project from the header menu to continue.</Text>
-          </Box>
-        </GridItem>
-      )}
+            <ChallengePanel />
+            <Splitter.ResizeTrigger id="challenge:solution">
+              <Splitter.ResizeTriggerSeparator className={statusClass + "-bg"} />
+              <Splitter.ResizeTriggerIndicator className={statusClass + "-bg"} />
+            </Splitter.ResizeTrigger>
+            <SolutionPanel />
+          </Splitter.Root>
+        </Box>
+        {projectSelection === "unknown" && (
+          <Flex position="absolute" inset="0" align="center" justify="center" pointerEvents="none">
+            <Box
+              backgroundColor="white"
+              padding="3"
+              border="3px solid black"
+              borderRadius="1rem"
+              maxWidth="50%"
+              height="min-content"
+              margin="auto"
+            >
+              <Text>The project "{project}" is not supported</Text>
+              <Text>Select a different project from the header menu to continue.</Text>
+            </Box>
+          </Flex>
+        )}
+      </GridItem>
       {projectSelection !== "unknown" && <Verifier />}
     </Grid>
   );

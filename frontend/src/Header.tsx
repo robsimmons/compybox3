@@ -64,7 +64,7 @@ export default function Header() {
                     .map((leanConfig) => (
                       <Select.Item item={leanConfig} key={leanConfig.value}>
                         {leanConfig.value === "unknown"
-                          ? `Unsupported project '${project}'`
+                          ? `Unsupported project "${project}"`
                           : leanConfig.label}
                         <Select.ItemIndicator />
                       </Select.Item>

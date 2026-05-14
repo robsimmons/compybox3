@@ -59,7 +59,12 @@ export function ChallengeTrust() {
         )}
       </Box>
       {recognition.type === "none" && (
-        <Box className={`${recognitionStatus}-bg popsup`} height="100%">
+        <Box
+          className={`${recognitionStatus}-bg popsup`}
+          height="100%"
+          paddingRight="3"
+          paddingBlock="1"
+        >
           <Button
             className="appears"
             onClick={() => {
