@@ -19,7 +19,7 @@ SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF
 ulimit -t 60       # 60 seconds
 ulimit -v 16777216 # 16gb (includes mmaped things)
-ulimit -u 512      # 512 subprocesses spawnable
+ulimit -u 128      # 128 subprocesses spawnable
 ulimit -f 524288   # File output size limits
 exec /lean/bin/lake build "$MODULE_NAME"
 EOF

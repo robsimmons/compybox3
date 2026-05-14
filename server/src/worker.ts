@@ -38,6 +38,7 @@ export async function doWork(
       output: err instanceof Error ? err.message : String(err),
     };
   } finally {
-    await cleanup(taskId);
+    console.log(`FINISHED: ${taskId} ${new Date().toISOString}`);
+    // await cleanup(taskId);
   }
 }
