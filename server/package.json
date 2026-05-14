@@ -7,7 +7,7 @@
     "lint": "eslint .",
     "prettier": "prettier --ignore-path ../.gitignore --check . ",
     "prettier:fix": "prettier --ignore-path ../.gitignore --write .",
-    "test": "vitest run --coverage",
+    "test": "USE_MOCK_VERIFICATION=true vitest run --coverage",
     "dev": "NODE_ENV=development node --watch ./src/server.ts",
     "start": "NODE_ENV=production node ./src/server.ts"
   },

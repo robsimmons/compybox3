@@ -26,7 +26,7 @@ describe(`POST /comparator/api/poll`, () => {
           await new Promise((resolve) => setTimeout(resolve, 200));
         }
       })(),
-    ).toStrictEqual({ type: "verification-ok" });
+    ).toStrictEqual({ type: "verification-ok", theoremNames: ["triv"] });
   });
 }, 50_000);
 

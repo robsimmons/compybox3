@@ -29,9 +29,14 @@ export class CheckingError extends Error {
   }
 }
 
-const BUFFER_LIMIT = 100_000;
+const BUFFER_LIMIT = 1_000_000;
+const BACKUP_SIGKILL_MS = 120_000;
 
-async function spawnPromise(
+/**
+ * Runs a command with limited options and returns a promise delivering
+ * a
+ */
+function spawnPromise(
   command: string,
   args?: readonly string[],
   options?: {
@@ -70,19 +75,27 @@ async function spawnPromise(
     handleStr(str);
   });
 
-  await new Promise((resolve, reject) => {
+  const cancelKill = setTimeout(() => proc.kill("SIGKILL"), BACKUP_SIGKILL_MS);
+  return new Promise((resolve, reject) => {
     proc.on("error", (err) => {
       reject(new CheckingError(`${description} failed: ${err.message}`, output.join("")));
     });
-    proc.on("close", () => resolve(undefined));
-  });
-  if (proc.exitCode !== 0) {
-    throw new CheckingError(
-      `${description} returned a non-zero exit code, indicating failure`,
-      output.join(""),
-    );
-  }
-  return output.join("");
+    proc.on("close", () => {
+      clearTimeout(cancelKill);
+      resolve(undefined);
+    });
+  })
+    .then(() => {
+      if (proc.exitCode !== 0) {
+        throw new CheckingError(
+          `${description} returned a non-zero exit code, indicating failure`,
+          output.join(""),
+        );
+      }
+    })
+    .then(() => {
+      output.join("");
+    });
 }
 
 const staging = (module: string) => `${module}-staging`;
@@ -134,8 +147,7 @@ export async function compile(
     args = [projDir, workDir, module];
   }
 
-  console.log("Calling", cmd, args)
-  await spawnPromise(cmd, args, {
+  return spawnPromise(cmd, args, {
     cwd: join(workDir, module),
     description: `Compilation of olean for ${module}`,
   });
@@ -160,8 +172,9 @@ export async function collectThms(taskId: string, project: string) {
     args = [projDir, workDir];
   }
 
+  // It would be a good idea to make sure this buffer doesn't grow without
+  // bound — we're not truncating standard out.
   const stdout: string[] = [];
-  console.log("Calling", cmd, args)
   await spawnPromise(cmd, args, {
     cwd: join(workDir, module),
     description: "Challenge theorem collection",
@@ -223,8 +236,7 @@ export async function comparator(taskId: string, project: string, theoremNames: 
     env = {};
   }
 
-  console.log("Calling", cmd, args)
-  await spawnPromise(cmd, args, {
+  return spawnPromise(cmd, args, {
     cwd: join(workDir, "Challenge"),
     description: "Comparator",
     env: { ...process.env, ...env },

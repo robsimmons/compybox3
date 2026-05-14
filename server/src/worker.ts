@@ -1,13 +1,15 @@
 import type { StartVerifyRequest, VerifyResult } from "@comparator/shared";
 
-import { CheckingError, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
+import { CheckingError, cleanup, collectThms, comparator, compile, createTaskDir } from "./exec.ts";
 import { doMockWork } from "./mockworker.ts";
+
+const USE_MOCK_VERIFICATION = !!process.env.USE_MOCK_VERIFICATION;
 
 export async function doWork(
   taskId: string,
   { project, challenge, solution }: StartVerifyRequest,
 ): Promise<VerifyResult> {
-  if (process.env.USE_MOCK_VERIFICATION) {
+  if (USE_MOCK_VERIFICATION) {
     return doMockWork(challenge, solution);
   }
 
@@ -17,7 +19,9 @@ export async function doWork(
       compile(taskId, project, "Challenge", challenge),
       compile(taskId, project, "Solution", solution),
     ]);
+
     const theoremNames = await collectThms(taskId, project);
+
     await comparator(taskId, project, theoremNames);
     return { type: "verification-ok", theoremNames };
   } catch (err) {
@@ -34,7 +38,6 @@ export async function doWork(
       output: err instanceof Error ? err.message : String(err),
     };
   } finally {
-    // XXX TURN THIS ONE ONCE WE'VE DEBUGGED STUFF
-    // await cleanup(taskId);
+    await cleanup(taskId);
   }
 }
