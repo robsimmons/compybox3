@@ -16,7 +16,7 @@ export default function Header() {
     >
       <svg
         className={statusClass}
-        style={{ padding: "0.7rem", height: "100%" }}
+        style={{ paddingInline: "0.7rem", marginBlock: "auto", height: "1rem", width: "auto" }}
         viewBox="0 0 486 169"
         xmlns="http://www.w3.org/2000/svg"
         fill="transparent"
@@ -31,7 +31,7 @@ export default function Header() {
         ></path>
       </svg>
       <Text marginBlock="auto" flexGrow="1" className={statusClass}>
-        Comparator <Em>(Experimental)</Em>
+        Comparator Live <Em>(Experimental)</Em>
       </Text>
       <GridItem colSpan={{ base: 2, md: 1 }}>
         <Flex>
