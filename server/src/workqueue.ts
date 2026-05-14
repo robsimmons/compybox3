@@ -6,7 +6,7 @@ import { Queue } from "./queue.ts";
 import { doWork } from "./worker.ts";
 
 /** Number of simultaneous processes. Must be 1 in development mode.  */
-const CONCURRENCY = 1;
+const CONCURRENCY = process.env.NODE_ENV === "production" ? 4 : 1;
 let runningJobCount = 0;
 
 const Q: Queue<string> = new Queue();
@@ -20,6 +20,13 @@ const jobDb = new Map<string, JobStatus>();
 
 let nextTicket = 1;
 let nextServed = 1;
+
+/**
+ * Health check/stats
+ */
+export function health() {
+  return { queueLength: Q.length, runningJobCount };
+}
 
 /**
  * Create a new work item for a verification request

@@ -7,7 +7,7 @@ import {
 import express, { type Response } from "express";
 import type { ZodSafeParseResult } from "zod";
 
-import { addWorkToQueue, cancelWork, checkWorkStatus } from "./workqueue.ts";
+import { addWorkToQueue, cancelWork, checkWorkStatus, health } from "./workqueue.ts";
 
 export const app = express();
 app.use(express.json());
@@ -23,6 +23,10 @@ function poorlyFormed<T>(
   }
   return false;
 }
+
+app.get("/comparator/api/health", (req, res) => {
+  res.send(health());
+});
 
 app.post("/comparator/api/start", (req, res) => {
   const body = zStartVerifyRequest.safeParse(req.body);

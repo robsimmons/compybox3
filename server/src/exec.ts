@@ -33,8 +33,10 @@ const BUFFER_LIMIT = 1_000_000;
 const BACKUP_SIGKILL_MS = 120_000;
 
 /**
- * Runs a command with limited options and returns a promise delivering
- * a
+ * Spawns with limited options and returns a promise with combined output
+ * (stdout/stderr combined). This will be truncated at `BUFFER_LIMIT`,
+ * the `stdout` and `stderr` options can be used to get non-truncated output
+ * for individual streams.
  */
 function spawnPromise(
   command: string,
