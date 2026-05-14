@@ -52,7 +52,7 @@ export const solutionAtom = codeAtom("url", "code", "codez");
 export const leanConfigs = createListCollection({
   items: [
     { label: "Latest Release", value: "MathlibDemo" },
-    { label: "Stable Release", value: "mathlib-stable" },
+    // { label: "Stable Release", value: "mathlib-stable" },
     { label: "Unsupported Project", value: "unknown" },
   ],
 });

@@ -86,8 +86,16 @@ export default function Verifier() {
       case "in-progress":
       case "in-queue": {
         status = (
-          <Box paddingLeft="3" paddingBlock="1" marginBlock="auto">
-            Verifying that the solution solves the challenge with comparator...
+          <Box paddingLeft="3" paddingBlock="3" marginBlock="auto">
+            <Text>Verifying that the solution solves the challenge with comparator.</Text>
+            {comparatorResult.type === "in-preparation" && <Text>Loading...</Text>}
+            {comparatorResult.type === "in-queue" && (
+              <Text>
+                Waiting in queue ({comparatorResult.position === 0 && "next in line"}
+                {comparatorResult.position > 0 && `#${comparatorResult.position + 1} in line`})...
+              </Text>
+            )}
+            {comparatorResult.type === "in-progress" && <Text>Currently running...</Text>}
           </Box>
         );
         icon = faQuestion;
@@ -96,7 +104,7 @@ export default function Verifier() {
 
       case "verification-ok": {
         status = (
-          <Box paddingLeft="3" paddingBlock="1" marginBlock="auto">
+          <Box paddingLeft="3" paddingBlock="3" marginBlock="auto">
             {comparatorResult.theoremNames.length === 0 && (
               <>
                 <Strong>Internal Consistency of Solution Verified.</Strong> Lean's kernel verified
@@ -141,7 +149,7 @@ export default function Verifier() {
 
       default: {
         status = (
-          <Box paddingLeft="3" paddingBlock="1" marginBlock="auto">
+          <Box paddingLeft="3" paddingBlock="3" marginBlock="auto">
             An unexpected condition occurred ({JSON.stringify(comparatorResult)}). Reloading and
             trying again may help.
           </Box>
