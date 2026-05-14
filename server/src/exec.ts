@@ -50,7 +50,6 @@ function spawnPromise(
     env?: NodeJS.ProcessEnv;
   },
 ) {
-  console.log(`${new Date().toISOString()} ${command} ${args}`);
   const description = options?.description ?? "Process";
   const proc = spawn(command, args, { cwd: options?.cwd, env: options?.env ?? process.env });
   let size = 0;

@@ -4,7 +4,6 @@ open Lean
 
 def main : IO UInt32 := do
   initSearchPath (← findSysroot)
-  let challenge := Import.mk `Challenge true true true
   let env ← importModules
     #[{ module := `Challenge, importAll := true}]
     {} (leakEnv := true) (loadExts := false)
