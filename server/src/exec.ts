@@ -1,7 +1,8 @@
-import { spawn } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { cp, mkdir, mkdtemp, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { promisify } from "node:util";
 
 import { z } from "zod";
 
@@ -96,7 +97,7 @@ function spawnPromise(
       }
     })
     .then(() => {
-      output.join("");
+      return output.join("");
     });
 }
 
@@ -174,8 +175,6 @@ export async function collectThms(taskId: string, project: string) {
     args = [projDir, workDir];
   }
 
-  // It would be a good idea to make sure this buffer doesn't grow without
-  // bound — we're not truncating standard out.
   const stdout: string[] = [];
   await spawnPromise(cmd, args, {
     cwd: join(workDir, module),
@@ -245,6 +244,15 @@ export async function comparator(taskId: string, project: string, theoremNames: 
   });
 }
 
+const execFileAsync = promisify(execFile);
 export async function cleanup(taskId: string) {
-  await rm(join(WORKING_TMP_ROOT_DIR, taskId), { recursive: true, force: true });
+  const dir = workingDir(taskId);
+  try {
+    // TODO CHECK THIS LOGIC
+    // Allow the overlayfs-created working directories to be deleted
+    await execFileAsync("chmod", ["-R", "u+rwX", dir]);
+  } catch (err) {
+    console.error("chmod during cleanup failed", { taskId, err });
+  }
+  await rm(workingDir(taskId), { recursive: true, force: true });
 }
