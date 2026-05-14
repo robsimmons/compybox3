@@ -35,27 +35,29 @@ export default function App() {
           <SolutionPanel />
         </Splitter.Root>
       </GridItem>
-      <GridItem
-        display="flex"
-        justifyContent="center"
-        alignContent="center"
-        gridArea="2/1"
-        zIndex={99}
-        backgroundColor={"rgba(255,255,255,50%)"}
-      >
-        <Box
-          backgroundColor="white"
-          padding="3"
-          border="3px solid black"
-          borderRadius="1rem"
-          maxWidth="50%"
-          height="min-content"
-          margin="auto"
+      {projectSelection === "unknown" && (
+        <GridItem
+          display="flex"
+          justifyContent="center"
+          alignContent="center"
+          gridArea="2/1"
+          zIndex={99}
+          backgroundColor={"rgba(255,255,255,50%)"}
         >
-          <Text>Comparator Live does not support the project '{project}'</Text>
-          <Text>Select a different project from the header menu to continue.</Text>
-        </Box>
-      </GridItem>
+          <Box
+            backgroundColor="white"
+            padding="3"
+            border="3px solid black"
+            borderRadius="1rem"
+            maxWidth="50%"
+            height="min-content"
+            margin="auto"
+          >
+            <Text>Comparator Live does not support the project '{project}'</Text>
+            <Text>Select a different project from the header menu to continue.</Text>
+          </Box>
+        </GridItem>
+      )}
       {projectSelection !== "unknown" && <Verifier />}
     </Grid>
   );
