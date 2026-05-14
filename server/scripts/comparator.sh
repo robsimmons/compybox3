@@ -19,7 +19,7 @@ SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF
 ulimit -t 60       # 60 seconds
 # ulimit -v 16777216 # 16gb (includes mmaped things)
-# ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)                                                                                        
+ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)                                                                                        
 ulimit -f 524288   # File output size limits
 exec /lean/bin/lake env comparator/.lake/build/bin/comparator config.json                                                                                                                                                                          
 EOF
@@ -41,7 +41,7 @@ exec bwrap \
      --setenv COMPARATOR_LEAN4EXPORT "/project/lean4export/.lake/build/bin/lean4export" \
      --setenv COMPARATOR_LANDRUN "/landrun/landrun" \
      --setenv HOME "/tmp" \
-     --setenv LEAN_NUM_THREADS "2" \
+     --setenv LEAN_NUM_THREADS "4" \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/Challenge/config.json" /project/config.json \

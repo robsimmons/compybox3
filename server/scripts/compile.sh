@@ -19,7 +19,7 @@ SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF
 ulimit -t 60       # 60 seconds
 # ulimit -v 16777216 # 16gb (includes mmaped things)
-# ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)                                                                                        
+ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)                                                                                        
 ulimit -f 524288   # File output size limits
 exec /lean/bin/lake build "$MODULE_NAME"
 EOF
@@ -39,7 +39,7 @@ exec bwrap \
      --clearenv \
      --setenv PATH "$GIT_PATH:$DIRNAME_PATH" \
      --setenv HOME "/tmp" \
-     --setenv LEAN_NUM_THREADS "2" \
+     --setenv LEAN_NUM_THREADS "4" \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/$MODULE_NAME/$MODULE_NAME.lean" "/project/$MODULE_NAME.lean" \
