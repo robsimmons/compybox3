@@ -17,7 +17,7 @@ SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF
 ulimit -t 60       # 60 seconds
 ulimit -v 16777216 # 16gb (includes mmaped things)
-ulimit -u 128      # 128 subprocesses spawnable
+ulimit -u 1024     # 1024 subprocesses spawnable                                                                                            
 ulimit -f 524288   # File output size limits
 exec /lean/bin/lake exe challenge-thms
 EOF
@@ -36,6 +36,7 @@ exec bwrap \
      --clearenv \
      --setenv PATH "$GIT_PATH:$DIRNAME_PATH" \
      --setenv HOME "/tmp" \
+     --setenv LEAN_NUM_THREADS "2" \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/Challenge/Challenge.lean" /project/Challenge.lean \
