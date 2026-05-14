@@ -45,13 +45,13 @@ export default function App() {
         {projectSelection === "unknown" && (
           <Flex position="absolute" inset="0" align="center" justify="center" pointerEvents="none">
             <Box
-              backgroundColor="white"
-              padding="3"
-              border="3px solid black"
-              borderRadius="1rem"
-              maxWidth="50%"
-              height="min-content"
-              margin="auto"
+              pointerEvents="auto"
+              bg="bg.panel"
+              borderWidth="1px"
+              borderColor="border"
+              borderRadius="lg"
+              shadow="lg"
+              padding="6"
             >
               <Text>The project "{project}" is not supported</Text>
               <Text>Select a different project from the header menu to continue.</Text>
