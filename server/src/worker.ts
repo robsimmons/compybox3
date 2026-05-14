@@ -39,6 +39,6 @@ export async function doWork(
     };
   } finally {
     console.log(`FINISHED: ${taskId} ${new Date().toISOString()}`);
-    // await cleanup(taskId);
+    await cleanup(taskId);
   }
 }
