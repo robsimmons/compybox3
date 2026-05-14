@@ -6,6 +6,7 @@ import {
   Dialog,
   Grid,
   Portal,
+  Span,
   Strong,
   Text,
 } from "@chakra-ui/react";
@@ -117,15 +118,18 @@ export default function Verifier() {
                 </Strong>{" "}
                 Lean's kernel verified that the solution proves the claims described in the
                 challenge's theorem{comparatorResult.theoremNames.length > 1 && "s"}{" "}
-                {comparatorResult.theoremNames.map((name) => (
-                  <Code key={name}>{name}</Code>
+                {comparatorResult.theoremNames.map((name, i) => (
+                  <Span key={name}>
+                    <Code>{name}</Code>
+                    {i + 2 === comparatorResult.theoremNames.length ? " and " : ", "}
+                  </Span>
                 ))}
                 {recognitionState?.type === "none" &&
-                  ", but it is possible that the challenge does not describe the theorems it appears to describe. This usually happens due to subtle oversights in the formalization statement, but it can also be the result of cheap slight-of-hand tricks that use Lean's powerful syntax extensions"}
+                  "but it is possible that the challenge does not describe the theorems it appears to describe. This usually happens due to subtle oversights in the formalization statement, but it can also be the result of cheap slight-of-hand tricks that use Lean's powerful syntax extensions"}
                 {recognitionState?.type === "user" &&
-                  `, and you have chosen to trust that this challenge correctly describes the theorem${comparatorResult.theoremNames.length > 1 ? "s" : ""} it purports to describe`}
+                  `and you have chosen to trust that this challenge correctly describes the theorem${comparatorResult.theoremNames.length > 1 ? "s" : ""} it purports to describe`}
                 {recognitionState?.type === "built-in" &&
-                  ", and the challenge is known to be trustworthy"}
+                  "and the challenge is known to be trustworthy"}
                 .
               </>
             )}
