@@ -21,7 +21,7 @@ ulimit -t 60       # 60 seconds
 ulimit -v 16777216 # 16gb (includes mmaped things)
 ulimit -u 128      # 128 subprocesses spawnable
 ulimit -f 524288   # File output size limits
-exec /lean/bin/lake exe comparator config.json
+exec /lean/bin/lake env comparator/.lake/build/bin/comparator config.json                                                                                                                                                                          
 EOF
 )
 
@@ -38,7 +38,7 @@ exec bwrap \
      \
      --clearenv \
      --setenv PATH "/lean/bin:$GIT_PATH:$DIRNAME_PATH:$WHICH_PATH" \
-     --setenv COMPARATOR_LEAN4EXPORT "/project/.lake/packages/lean4export/.lake/build/bin/lean4export" \
+     --setenv COMPARATOR_LEAN4EXPORT "/project/lean4export/.lake/build/bin/lean4export" \
      --setenv COMPARATOR_LANDRUN "/landrun/landrun" \
      --setenv HOME "/tmp" \
      \

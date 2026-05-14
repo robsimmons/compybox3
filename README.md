@@ -25,6 +25,9 @@ To document better:
 
 assumes landrun is at $HOME/landrun/landrun
 
+git clone https://github.com/leanprover/lean4export.git --depth 1 --branch v4.30.0-rc2
+git clone https://github.com/leanprover/comparator.git --depth 1
+
 ## Vite+Express Full-stack React Application with Workspaces
 
 This project has three parts, which together form an
