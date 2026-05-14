@@ -39,8 +39,8 @@ exec bwrap \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/Challenge/Challenge.lean" /project/Challenge.lean \
-     --overlay-src "$WORK_DIR/Challenge/.lake/build" \
      --overlay-src "$PROJECT_DIR/.lake/build" \
+     --overlay-src "$WORK_DIR/Challenge/.lake/build" \
      --overlay "$WORK_DIR/ChallengeThms" "$WORK_DIR/ChallengeThms-staging" /project/.lake/build \
      \
      --unshare-all \
