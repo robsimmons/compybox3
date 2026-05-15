@@ -119,10 +119,15 @@ export const unobserve = observe((get, set) => {
       if (body.type !== "in-progress" && body.type !== "in-queue") return;
     }
   })().catch((err: unknown) => {
-    if (controller.signal.aborted) return;
+    // Don't set an error for an AbortError. It's probably from
+    // `controller.signal.throwIfAborted()` because the cleanup handler is
+    // running, and if it's not that it's almost certainly cancellation due to
+    // a page unload event. If something else aborted the fetch, the user will
+    // just see the app as stuck in the waiting state.
+    if (err instanceof Error && err.name === "AbortError") return;
     set(comparatorResultAtom, {
       type: "verification-failed",
-      description: `Unexpected error waiting`,
+      description: `Unexpected error while waiting for response`,
       output: err instanceof Error ? err.message : String(err),
     });
   });
