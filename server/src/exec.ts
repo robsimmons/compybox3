@@ -249,8 +249,7 @@ const execFileAsync = promisify(execFile);
 export async function cleanup(taskId: string) {
   const dir = workingDir(taskId);
   try {
-    // TODO CHECK THIS LOGIC
-    // Allow the overlayfs-created working directories to be deleted
+    // Necessary to allow the overlayfs-created working directories to be deleted
     await execFileAsync("chmod", ["-R", "u+rwX", dir]);
   } catch (err) {
     console.error("chmod during cleanup failed", { taskId, err });
