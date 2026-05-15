@@ -1,31 +1,35 @@
-#!/usr/bin/env bash                                                                                                                         
+#!/usr/bin/env bash
 
-set -euo pipefail # realpath or dirname failure should abort                                                                                
+set -euo pipefail # realpath or dirname failure should abort
 
 PROJECT_DIR="$(realpath "$1")" # Read-only project source
 shift
 WORK_DIR="$(realpath "$1")"    # Task-specific temporary directory
 shift
 
+
+
 GIT_PATH=$(dirname $(realpath $(which git)))
 DIRNAME_PATH=$(dirname $(realpath $(which dirname)))
 WHICH_PATH=$(dirname $(realpath $(which which)))
 
 cd $PROJECT_DIR
-LANDRUN_ROOT=$(realpath "$HOME/landrun")
 LEAN_ROOT="$(lean --print-prefix)"
+LANDRUN_ROOT=$(realpath "$HOME/landrun")
 
 SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF
 ulimit -t 60       # 60 seconds
-ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)                                                                                        
+ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)
 ulimit -f 524288   # File output size limits
-exec /lean/bin/lake env comparator/.lake/build/bin/comparator config.json                                                                                                                                                                          
+exec /lean/bin/lake env comparator/.lake/build/bin/comparator config.json
 EOF
 )
 
 mkdir -p "$WORK_DIR/Comparator"
 mkdir -p "$WORK_DIR/Comparator-staging"
+
+
 exec bwrap \
      --ro-bind /nix /nix \
      --ro-bind "$LEAN_ROOT" /lean \
@@ -36,11 +40,11 @@ exec bwrap \
      --proc /proc \
      \
      --clearenv \
+     --setenv HOME "/tmp" \
+     --setenv LEAN_NUM_THREADS "4" \
      --setenv PATH "/lean/bin:$GIT_PATH:$DIRNAME_PATH:$WHICH_PATH" \
      --setenv COMPARATOR_LEAN4EXPORT "/project/lean4export/.lake/build/bin/lean4export" \
      --setenv COMPARATOR_LANDRUN "/landrun/landrun" \
-     --setenv HOME "/tmp" \
-     --setenv LEAN_NUM_THREADS "4" \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/Challenge/config.json" /project/config.json \

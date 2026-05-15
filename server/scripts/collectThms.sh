@@ -1,22 +1,26 @@
-#!/usr/bin/env bash                                                                                                                         
+#!/usr/bin/env bash
 
-set -euo pipefail # realpath or dirname failure should abort                                                                                
+set -euo pipefail # realpath or dirname failure should abort
 
 PROJECT_DIR="$(realpath "$1")" # Read-only project source
 shift
 WORK_DIR="$(realpath "$1")"    # Task-specific temporary directory
 shift
 
+
+
 GIT_PATH=$(dirname $(realpath $(which git)))
 DIRNAME_PATH=$(dirname $(realpath $(which dirname)))
+
 
 cd $PROJECT_DIR
 LEAN_ROOT="$(lean --print-prefix)"
 
+
 SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF
 ulimit -t 60       # 60 seconds
-ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)                                                                                        
+ulimit -u 65536    # 65536 subprocesses spawnable (lake can use a lot here!)
 ulimit -f 524288   # File output size limits
 exec /lean/bin/lake exe challenge-thms
 EOF
@@ -24,18 +28,21 @@ EOF
 
 mkdir -p $WORK_DIR/ChallengeThms
 mkdir -p $WORK_DIR/ChallengeThms-staging
+
+
 exec bwrap \
      --ro-bind /nix /nix \
      --ro-bind "$LEAN_ROOT" /lean \
+     \
      \
      --dev /dev \
      --tmpfs /tmp \
      --proc /proc \
      \
      --clearenv \
-     --setenv PATH "$GIT_PATH:$DIRNAME_PATH" \
      --setenv HOME "/tmp" \
      --setenv LEAN_NUM_THREADS "4" \
+     --setenv PATH "$GIT_PATH:$DIRNAME_PATH" \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/Challenge/Challenge.lean" /project/Challenge.lean \

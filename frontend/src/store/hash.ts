@@ -4,8 +4,8 @@ import { atomWithLocation } from "jotai-location";
 import { fixedEncodeURIComponent } from "../utils/uri.ts";
 
 /**
- * Manage the hash params in a custom way; we slightly differ from the default
- * behavior that jotai-location's `atomWithHash` uses.
+ * Manage the hash params in a custom way; this diverges slightly from the
+ * behavior that jotai-location's `atomWithHash` in a couple of ways.
  *
  * IMPORTANT:
  * Most of the functionality in this file must exactly match the Live Lean
