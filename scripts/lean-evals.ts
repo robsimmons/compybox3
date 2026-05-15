@@ -30,6 +30,16 @@ async function main() {
   const files = await Promise.all(
     projects.map(async (d) => {
       if (!d.isDirectory()) return null;
+      const proj = d.name;
+      const dir = join(GENERATED_DIR, d);
+      try {
+        const readme = await readFile(join(dir, "README.md"));
+        const line = readme.split("\n")[3]?.trim() ?? "";
+        if (line === "") throw new Error("README line 3 empty");
+      } catch (e) {
+        console.error(`skipping ${d.name}: ${e instanceof Error ? e.message : String(e)}`);
+        return null;
+      }
       const challengePath = join(GENERATED_DIR, d.name, "Challenge.lean");
       if (!(await exists(challengePath))) return null;
       return null;

@@ -1,7 +1,10 @@
 {
   "name": "@comparator/scripts",
   "type": "module",
-  "devDependencies": {
-    "@types/node": "^25.8.0"
+  "scripts": {
+    "check": "tsc",
+    "lint": "eslint .",
+    "prettier": "prettier --ignore-path ../.gitignore --check . ",
+    "prettier:fix": "prettier --ignore-path ../.gitignore --write ."
   }
 }
