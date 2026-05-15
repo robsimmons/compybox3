@@ -30,7 +30,7 @@ EOF
 # the challenge modifying what `lake exe challenge-thms` does, but if the
 # challenge has a Challenge.olean, this means we won't see the user's
 # Challenge.olean. Detect this condition and abort.
-if [[ -d "$PROJECT_DIR/.lake/build/lib/lean/Challenge.olean"]]; then
+if [[ -d "$PROJECT_DIR/.lake/build/lib/lean/Challenge.olean" ]]; then
      echo "error: $PROJECT_DIR contains a Challenge.olean" >&2
      echo "This prevents theorems from being collected" >&2
      exit 1
