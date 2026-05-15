@@ -4,6 +4,7 @@ import { CheckingError, cleanup, collectThms, comparator, compile, createTaskDir
 import { doMockWork } from "./mockworker.ts";
 
 const USE_MOCK_VERIFICATION = !!process.env.USE_MOCK_VERIFICATION;
+const KEEP_COMPARATOR_TEMP_FILES = !!process.env.KEEP_COMPARATOR_TEMP_FILES;
 
 export async function doWork(
   taskId: string,
@@ -38,6 +39,8 @@ export async function doWork(
       output: err instanceof Error ? err.message : String(err),
     };
   } finally {
-    await cleanup(taskId);
+    if (!KEEP_COMPARATOR_TEMP_FILES) {
+      await cleanup(taskId);
+    }
   }
 }
