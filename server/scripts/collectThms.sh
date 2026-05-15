@@ -26,6 +26,15 @@ exec /lean/bin/lake exe challenge-thms
 EOF
 )
 
+# We want $PROJECT_DIR to be on top in the overlay so that there's no risk of
+# the challenge modifying what `lake exe challenge-thms` does, but if the
+# challenge has a Challenge.olean, this means we won't see the user's
+# Challenge.olean. Detect this condition and abort.
+if [[ -d "$PROJECT_DIR/.lake/build/lib/lean/Challenge.olean"]]; then
+     echo "error: $PROJECT_DIR contains a Challenge.olean" >&2
+     echo "This prevents theorems from being collected" >&2
+     exit 1
+fi
 mkdir -p $WORK_DIR/ChallengeThms
 mkdir -p $WORK_DIR/ChallengeThms-staging
 
@@ -46,8 +55,8 @@ exec bwrap \
      \
      --ro-bind "$PROJECT_DIR" /project \
      --ro-bind "$WORK_DIR/Challenge/Challenge.lean" /project/Challenge.lean \
-     --overlay-src "$PROJECT_DIR/.lake/build" \
      --overlay-src "$WORK_DIR/Challenge/.lake/build" \
+     --overlay-src "$PROJECT_DIR/.lake/build" \
      --overlay "$WORK_DIR/ChallengeThms" "$WORK_DIR/ChallengeThms-staging" /project/.lake/build \
      \
      --unshare-all \
