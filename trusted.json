@@ -1,4 +1,8 @@
 {
+  "26bde8d59e144f0db7f657b709784f9c4ed4fb86af775d8bffe5a33073a9b202": {
+    "name": "pi_1 of the circle is Z",
+    "sources": ["https://lean-lang.org/eval/problems/pi1_circle_mulEquiv_int/"]
+  },
   "3d139f85ba4e5bb3a21bf1b30c5ee9cfd5268e2f5727af81a7c63f63b0bcf318": {
     "name": "Infinitely Many Primes",
     "sources": ["https://lean-lang.org/"]
