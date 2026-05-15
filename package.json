@@ -5,7 +5,8 @@
   "workspaces": [
     "frontend",
     "server",
-    "shared"
+    "shared",
+    "scripts"
   ],
   "files": [
     "frontend/dist",
