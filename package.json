@@ -9,11 +9,10 @@
     "scripts"
   ],
   "files": [
+    "*/package.json",
     "frontend/dist",
-    "frontend/package.json",
     "server/scripts",
     "server/src",
-    "server/package.json",
     "shared"
   ],
   "scripts": {
