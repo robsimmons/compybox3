@@ -1,4 +1,11 @@
 {
+  "1e44f1388ab52888f0bfe86c1bb01602705430133fc39a3f22a69bafb00ef6fb": {
+    "name": "Oppenheim's inequality for Hadamard products",
+    "sources": [
+      "https://lean-lang.org/eval/problems/oppenheim_inequality/",
+      "https://github.com/leanprover/lean-eval/tree/main/generated/oppenheim_inequality"
+    ]
+  },
   "26bde8d59e144f0db7f657b709784f9c4ed4fb86af775d8bffe5a33073a9b202": {
     "name": "pi_1 of the circle is Z",
     "sources": [
