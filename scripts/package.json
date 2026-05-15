@@ -1,0 +1,7 @@
+{
+  "name": "@comparator/scripts",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^25.8.0"
+  }
+}
