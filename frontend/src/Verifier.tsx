@@ -34,8 +34,13 @@ export default function Verifier() {
 
   let status: JSX.Element;
   let action: JSX.Element | null;
-  if (!isComparatorSynced) {
-    status = (
+  if (!isComparatorSynced || comparatorResult.type === "not-found") {
+    status = isComparatorSynced ? (
+      <Box paddingLeft="3" paddingBlock="3" marginBlock="auto">
+        <Strong>Job Lost.</Strong> This can happen when the server restarts; re-running verification
+        or reloading the page should help.
+      </Box>
+    ) : (
       <Text paddingLeft="3" paddingBlock="1" marginBlock="auto">
         <Strong>Not Verified.</Strong> Press the button to request verification.
       </Text>
@@ -145,16 +150,6 @@ export default function Verifier() {
         );
         icon = faCheck;
         break;
-      }
-
-      default: {
-        status = (
-          <Box paddingLeft="3" paddingBlock="3" marginBlock="auto">
-            An unexpected condition occurred ({JSON.stringify(comparatorResult)}). Reloading and
-            trying again may help.
-          </Box>
-        );
-        icon = faQuestion;
       }
     }
     action = (
