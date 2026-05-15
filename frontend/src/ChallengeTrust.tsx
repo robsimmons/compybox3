@@ -45,7 +45,11 @@ export function ChallengeTrust() {
             {recognition.sources.map((href, i) => (
               <Span key={i}>
                 {" ["}
-                {<Link href={href}>{i + 1}</Link>}
+                {
+                  <Link href={href} target="_blank">
+                    {i + 1}
+                  </Link>
+                }
                 {"]"}
               </Span>
             ))}
