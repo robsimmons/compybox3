@@ -6,7 +6,6 @@ import {
   Dialog,
   Grid,
   Portal,
-  Span,
   Strong,
   Text,
 } from "@chakra-ui/react";
@@ -23,6 +22,7 @@ import {
   comparatorResultAtom,
   isComparatorSyncedAtom,
 } from "./store/verifier.ts";
+import { oxford } from "./utils/language.tsx";
 
 export default function Verifier() {
   const statusClass = useAtomValue(statusClassAtom);
@@ -121,28 +121,29 @@ export default function Verifier() {
             {comparatorResult.theoremNames.length > 0 && (
               <>
                 <Strong>
-                  Success
-                  {/* transform into "Successfully" if it's a qualified success*/}
-                  {recognitionState?.type === "none" &&
-                    "fully validated against untrusted challenge"}
-                  {recognitionState?.type === "user" &&
-                    "fully validated against locally-trusted challenge"}
-                  .
+                  {recognitionState?.type === "none"
+                    ? "Successfully validated against untrusted challenge."
+                    : recognitionState?.type === "user"
+                      ? "Successfully validated against locally-trusted challenge."
+                      : "Success."}
                 </Strong>{" "}
                 Lean's kernel verified that the solution proves the claims described in the
-                challenge's theorem{comparatorResult.theoremNames.length > 1 && "s"}{" "}
-                {comparatorResult.theoremNames.map((name, i) => (
-                  <Span key={name}>
-                    <Code>{name}</Code>
-                    {i + 2 === comparatorResult.theoremNames.length ? " and " : ", "}
-                  </Span>
-                ))}
+                challenge's theorem{comparatorResult.theoremNames.length > 1 && "s"} (
+                {oxford(
+                  comparatorResult.theoremNames
+                    .toSorted((a, b) => a.localeCompare(b))
+                    .map((name) => ({
+                      key: name,
+                      elem: <Code>{name}</Code>,
+                    })),
+                )}
+                )
                 {recognitionState?.type === "none" &&
-                  "but it is possible that the challenge does not describe the theorems it appears to describe. This usually happens due to subtle oversights in the formalization statement, but it can also result from dishonest use of Lean's powerful syntax extensions"}
+                  ", but it is possible that the challenge does not describe the theorems it appears to describe. This usually happens due to subtle oversights in the formalization statement, but it can also result from dishonest use of Lean's powerful syntax extensions"}
                 {recognitionState?.type === "user" &&
-                  `and you have chosen to trust that this challenge correctly describes the theorem${comparatorResult.theoremNames.length > 1 ? "s" : ""} it purports to describe`}
+                  `, and you have chosen to trust that this challenge correctly describes the theorem${comparatorResult.theoremNames.length > 1 ? "s" : ""} it purports to describe`}
                 {recognitionState?.type === "built-in" &&
-                  "and the challenge is known to be trustworthy"}
+                  ", and the challenge is known to be trustworthy"}
                 .
               </>
             )}
