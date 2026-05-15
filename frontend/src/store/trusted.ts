@@ -1,7 +1,6 @@
 import { atom } from "jotai";
 import { atomWithStorage, unwrap } from "jotai/utils";
 
-import trustedJson from "../../../trusted.json";
 import { challengeAtom } from "./params.ts";
 
 const CHALLENGE_HASH_MS_DEBOUNCE = 800;
@@ -47,13 +46,6 @@ export const locallyTrustedAtom = atom(
   },
 );
 
-const builtInTrusted: {
-  [key: string]: {
-    name: string;
-    sources: string[];
-  };
-} = trustedJson;
-
 type TrustRecognition =
   | { type: "built-in"; name: string; sources: string[] }
   | { type: "user"; name: string }
@@ -71,6 +63,7 @@ export const recognitionAtom = atom<Promise<TrustRecognition>>(async (get) => {
 
   const challengeHash = await get(challengeHashAtom);
 
+  const { builtInTrusted } = await import("./builtInTrusted.ts");
   const builtInTrust = builtInTrusted[challengeHash];
   if (builtInTrust) return { type: "built-in", ...builtInTrust };
 
