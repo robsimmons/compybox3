@@ -4,10 +4,10 @@ import { useAtomValue } from "jotai";
 import ChallengePanel from "./ChallengePanel.tsx";
 import Header from "./Header.tsx";
 import SolutionPanel from "./SolutionPanel.tsx";
+import { projectAtom, projectSelectionAtom } from "./store/params.ts";
 import { statusClassAtom } from "./store/simpleStatus.ts";
 import { borderForStatus } from "./utils/style.ts";
 import Verifier from "./Verifier.tsx";
-import { projectAtom, projectSelectionAtom } from "./store/params.ts";
 
 export default function App() {
   const project = useAtomValue(projectAtom);
