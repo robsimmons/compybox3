@@ -74,7 +74,7 @@ export default function Verifier() {
                   <Dialog.Title>{comparatorResult.description}</Dialog.Title>
                 </Dialog.Header>
                 <Dialog.Body>
-                  <Code as="pre" overflowX="scroll" width="100%">
+                  <Code as="pre" overflowX="auto" width="100%">
                     {comparatorResult.output ?? "No output generated"}
                   </Code>
                 </Dialog.Body>
