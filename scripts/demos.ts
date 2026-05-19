@@ -23,7 +23,7 @@ async function main() {
         sources.push(contents.shift()!.slice(3).trim());
       }
 
-      const name = basename(chall);
+      const name = basename(chall, ".lean");
       return [sha256(contents.join("\n")), { name, sources }];
     }),
   );

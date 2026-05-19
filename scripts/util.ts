@@ -3,11 +3,11 @@ import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { exit } from "node:process";
 
-if (process.env.npm_config_local_prefix!) {
+if (!process.env.npm_config_local_prefix!) {
   console.error("This script must be run through `npm run`");
   exit(1);
 }
-export const ROOT_DIR = process.env.npm_config_local_prefix!;
+export const ROOT_DIR = process.env.npm_config_local_prefix;
 export const WORK_DIR = join(ROOT_DIR, ".scripts-tmp");
 execSync(`mkdir -p ${WORK_DIR}`);
 
