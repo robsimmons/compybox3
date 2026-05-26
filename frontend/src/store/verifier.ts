@@ -25,7 +25,9 @@ let internalIdSequenceNumber = 0;
 const comparatorJobParamsHolder = atom<ComparatorJobParams | null>(null);
 
 /**
- * Tracks the version of the code that was most recently sent to comparator.
+ * Action atom that can be read to get the version of the code that was most
+ * recently sent to comparator.
+ *
  * Setting this atom with no arguments snapshots the current code into
  * `comparatorJobParamsHolder`, which is only accessed through this atom.
  * and increments the counter; incrementing the counter triggers a new
