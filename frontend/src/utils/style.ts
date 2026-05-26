@@ -1,5 +1,6 @@
 export type SimpleStatus = "neutral" | "stale" | "working" | "success" | "warning" | "failure";
 
+/** Needs to match CSS, but currently easier to set in code. */
 export function borderForStatus(st: SimpleStatus) {
   switch (st) {
     case "failure":
