@@ -26,7 +26,8 @@ const comparatorJobParamsHolder = atom<ComparatorJobParams | null>(null);
 
 /**
  * Action atom that can be read to get the version of the code that was most
- * recently sent to comparator.
+ * recently sent to comparator (see
+ * https://jotai.org/docs/guides/composing-atoms#action-atoms).
  *
  * Setting this atom with no arguments snapshots the current code into
  * `comparatorJobParamsHolder`, which is only accessed through this atom.
