@@ -5,7 +5,7 @@
 export function fixedEncodeURIComponent(str: string) {
   return encodeURIComponent(str).replace(
     // /[!'()*]/g, // this is the one recommended on MDN
-    /[()]/g, // this is the exact one used on Lean Playground
+    /[()]/g, // this is the exact one used on Live Lean
     (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
   );
 }

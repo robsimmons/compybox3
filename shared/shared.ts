@@ -31,11 +31,15 @@ export const zVerifyResult = z.discriminatedUnion("type", zVerifyPossibilities);
 export type VerifyResult = z.infer<typeof zVerifyResult>;
 
 export const zCheckVerifyResponse = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("initial-load") }),
   z.object({ type: z.literal("in-queue"), position: z.int().gte(0) }),
   z.object({ type: z.literal("in-progress") }),
-  z.object({ type: z.literal("in-preparation") }),
   z.object({ type: z.literal("not-found") }),
   ...zVerifyPossibilities,
 ]);
 export type CheckVerifyResponse = z.infer<typeof zCheckVerifyResponse>;
+
+/** Client-only notion extending CheckVerifyResponse with initial values */
+export type CheckVerifyStatus =
+  | CheckVerifyResponse
+  | { type: "initial-load" }
+  | { type: "in-preparation" };

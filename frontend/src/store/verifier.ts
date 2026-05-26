@@ -1,5 +1,5 @@
 import {
-  type CheckVerifyResponse,
+  type CheckVerifyStatus,
   zCheckVerifyResponse,
   zStartVerifyResponse,
 } from "@comparator/shared";
@@ -31,8 +31,8 @@ const comparatorJobParamsHolder = atom<ComparatorJobParams | null>(null);
  *
  * Setting this atom with no arguments snapshots the current code into
  * `comparatorJobParamsHolder`, which is only accessed through this atom.
- * and increments the counter; incrementing the counter triggers a new
- * Comparator query.
+ * Setting also incrementing a counter that forces a new Comparator query
+ * via `comparatorJobIdAtom`.
  */
 export const comparatorJobParamsAtom = atom(
   (get) => get(comparatorJobParamsHolder),
@@ -61,7 +61,7 @@ export const isComparatorSyncedAtom = atom((get) => {
 });
 
 /**
- *
+ * Comparator API query, triggered whenever `comparatorJobParamsAtom` is set.
  */
 const comparatorJobIdAtom = atomWithQuery((get) => {
   const params = get(comparatorJobParamsAtom);
@@ -104,7 +104,7 @@ const comparatorJobIdAtom = atomWithQuery((get) => {
  * Not explicitly read-only, but should only be set by the effect observer in
  * `src/store/verifier.ts`.
  */
-export const comparatorResultAtom = atom<CheckVerifyResponse>({ type: "initial-load" });
+export const comparatorResultAtom = atom<CheckVerifyStatus>({ type: "initial-load" });
 
 /**
  * Effect observer that triggers whenever `comparatorJobIdAtom` is set and
@@ -121,6 +121,7 @@ export const unobserve = observe((get, set) => {
     set(comparatorResultAtom, { type: "in-preparation" });
     return;
   }
+
   if (status === "error") {
     set(comparatorResultAtom, {
       type: "verification-failed",
