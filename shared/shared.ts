@@ -38,7 +38,7 @@ export const zCheckVerifyResponse = z.discriminatedUnion("type", [
 ]);
 export type CheckVerifyResponse = z.infer<typeof zCheckVerifyResponse>;
 
-/** Client-only notion extending CheckVerifyResponse with initial values */
+/** Client-only superset of `CheckVerifyResponse` */
 export type CheckVerifyStatus =
   | CheckVerifyResponse
   | { type: "initial-load" }

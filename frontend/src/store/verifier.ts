@@ -29,10 +29,12 @@ const comparatorJobParamsHolder = atom<ComparatorJobParams | null>(null);
  * recently sent to comparator (see
  * https://jotai.org/docs/guides/composing-atoms#action-atoms).
  *
- * Setting this atom with no arguments snapshots the current code into
- * `comparatorJobParamsHolder`, which is only accessed through this atom.
- * Setting also incrementing a counter that forces a new Comparator query
- * via `comparatorJobIdAtom`.
+ * Setting this atom with no arguments does two things:
+ *
+ *  - snapshots the current code into `comparatorJobParamsHolder`, which is
+ *    only accessed through this atom.
+ *  - incrementing a counter that forces a new Comparator query via
+ *    `comparatorJobIdAtom`.
  */
 export const comparatorJobParamsAtom = atom(
   (get) => get(comparatorJobParamsHolder),
