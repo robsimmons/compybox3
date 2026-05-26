@@ -16,7 +16,21 @@ interface ComparatorJobParams {
   solution: string;
 }
 let internalIdSequenceNumber = 0;
+
+/**
+ * Stores the last version of code sent to comparator.
+ *
+ * Must only be accessed through `comparatorJobParamsAtom`
+ */
 const comparatorJobParamsHolder = atom<ComparatorJobParams | null>(null);
+
+/**
+ * Tracks the version of the code that was most recently sent to comparator.
+ * Setting this atom with no arguments snapshots the current code into
+ * `comparatorJobParamsHolder`, which is only accessed through this atom.
+ * and increments the counter; incrementing the counter triggers a new
+ * Comparator query.
+ */
 export const comparatorJobParamsAtom = atom(
   (get) => get(comparatorJobParamsHolder),
   (get, set) => {
@@ -31,7 +45,7 @@ export const comparatorJobParamsAtom = atom(
 
 /**
  * Tracks whether the version of code that's been sent to comparator most
- * recently is the code we're looking at,
+ * recently is the code we're looking at.
  */
 export const isComparatorSyncedAtom = atom((get) => {
   const params = get(comparatorJobParamsAtom);
@@ -43,7 +57,10 @@ export const isComparatorSyncedAtom = atom((get) => {
   );
 });
 
-export const comparatorJobIdAtom = atomWithQuery((get) => {
+/**
+ *
+ */
+const comparatorJobIdAtom = atomWithQuery((get) => {
   const params = get(comparatorJobParamsAtom);
   return {
     queryKey: ["comparator-start", params?.internalId ?? null],
@@ -80,15 +97,24 @@ export const comparatorJobIdAtom = atomWithQuery((get) => {
  * The last known output from comparator for the current code. (If
  * isComparatorSyncedAtom is false, this should not be shown to the user, as
  * it's out of date!)
+ *
+ * Not explicitly read-only, but should only be set by the effect observer in
+ * `src/store/verifier.ts`.
  */
-export const comparatorResultAtom = atom<CheckVerifyResponse>({ type: "in-preparation" });
+export const comparatorResultAtom = atom<CheckVerifyResponse>({ type: "initial-load" });
 
+/**
+ * Effect observer that triggers whenever `comparatorJobIdAtom` is set and
+ * manages the effect.
+ */
 export const unobserve = observe((get, set) => {
   const { data: requestId, status, isEnabled } = get(comparatorJobIdAtom);
-  if (!isEnabled || status === "pending") {
-    // "in-preparation" as the status for `!isEnabled` is justified by
-    // immediately kicking off verification in the initializeStore, which will
-    // turn isEnabled true before pretty much anything happens.
+  if (!isEnabled) {
+    set(comparatorResultAtom, { type: "initial-load" });
+    return;
+  }
+
+  if (status === "pending") {
     set(comparatorResultAtom, { type: "in-preparation" });
     return;
   }
@@ -100,7 +126,7 @@ export const unobserve = observe((get, set) => {
     return;
   }
 
-  // If controller aborts, we mustn't set comparatorAtom
+  // If controller aborts, we mustn't set `comparatorResultAtom`
   const controller = new AbortController();
   (async () => {
     for (;;) {
@@ -120,9 +146,14 @@ export const unobserve = observe((get, set) => {
     }
   })().catch((err: unknown) => {
     if (controller.signal.aborted) return;
-    // Don't set an error for an AbortError. It's probably cancellation due to
-    // a page unload event. If something else aborted the fetch, the user will
-    // just see the app as stuck in the waiting state.
+    // Don't go to an error state if the error is an AbortError. The reasoning
+    // is that it's *probably* cancellation due to a page unload event, and
+    // this avoids flashing a quick error state on some page navigation
+    // events.
+    //
+    // If we're wrong, and something else aborted the fetch, the user will see
+    // the app as stuck in the waiting state. That's better than flashing a
+    // quick error state on page navigation.
     if (err instanceof Error && err.name === "AbortError") return;
     set(comparatorResultAtom, {
       type: "verification-failed",

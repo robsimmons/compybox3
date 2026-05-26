@@ -59,7 +59,7 @@ theorem InfinitudeOfPrimes : ∀ n, ∃ p > n, IsPrime p := by
 
 /**
  * Initialize appropriate first-time defaults and kick off the first
- * comparator job
+ * comparator job. Uses a demo if there's nothing given.
  */
 export function initializeStore(store: Store) {
   if (

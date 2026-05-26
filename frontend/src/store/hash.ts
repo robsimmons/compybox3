@@ -4,14 +4,10 @@ import { atomWithLocation } from "jotai-location";
 import { fixedEncodeURIComponent } from "../utils/uri.ts";
 
 /**
- * Manage the hash params in a custom way; this diverges slightly from the
- * behavior that jotai-location's `atomWithHash` in a couple of ways.
- *
- * IMPORTANT:
- * Most of the functionality in this file must exactly match the Live Lean
- * app's behavior for cross-site switching to work.
+ * Manage the hash params in a custom way. This diverges slightly from the
+ * behavior that jotai-location's `atomWithHash` in a couple of ways, for the
+ * purpose of exactly matching the Live Lean app's behavior.
  */
-
 export type HashArgs = { [key: string]: string | null };
 
 /**
@@ -36,7 +32,7 @@ function formatArgs(args: HashArgs): string {
 
 /**
  * Parse arguments from URL. These are of the form `#project=Mathlib&url=...`,
- * where the leading hash is optional
+ * where the leading hash is optional.
  */
 function parseArgs(hash: string): { [key: string]: string } {
   if (hash === "") return {};
@@ -58,9 +54,14 @@ function parseArgs(hash: string): { [key: string]: string } {
 
 /**
  * Jotai's mechanism for syncing with the URL. We'll interact with this
- * entirely through hashArgsAtom
+ * entirely through hashArgsAtom, so we don't export.
+ *
+ * `{ replace : true }` means keystroke don't create new browser history
+ * elements, which is probably what we want: the Live Lean app started using
+ * this option here:
+ * https://github.com/leanprover-community/lean4web/pull/112/changes
  */
-const locationAtom = atomWithLocation();
+const locationAtom = atomWithLocation({ replace: true });
 
 /**
  * Atom containing the key/value pairs in the hash. The functions in

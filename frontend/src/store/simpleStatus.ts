@@ -21,6 +21,7 @@ export const statusClassAtom = atom((get): SimpleStatus => {
   const comparator = get(comparatorResultAtom);
 
   switch (comparator.type) {
+    case "initial-load":
     case "in-preparation":
     case "in-progress":
     case "in-queue": {

@@ -26,12 +26,11 @@ export const challengeHashAtom = atom(async (get, { signal }) => {
     .join("");
 });
 
-export const storeTrustedAtom = atomWithStorage<[string, string][]>(
-  "locallyTrusted",
-  [],
-  undefined,
-  { getOnInit: true },
-);
+const storeTrustedAtom = atomWithStorage<[string, string][]>("locallyTrusted", [], undefined, {
+  getOnInit: true,
+});
+
+/** The set of challenges the user has chosen to trust */
 export const locallyTrustedAtom = atom(
   (get) => {
     const stored = get(storeTrustedAtom);
@@ -73,4 +72,10 @@ export const recognitionAtom = atom<Promise<TrustRecognition>>(async (get) => {
   return { type: "none" };
 });
 
+/**
+ * Same as `recognitionAtom`, but allows a synchronous check on an unready
+ * promise (null means the promise is not ready).
+ *
+ * Implemented with [unwrap](https://jotai.org/docs/utilities/async#unwrap).
+ */
 export const recognitionStateAtom = unwrap(recognitionAtom, () => null);

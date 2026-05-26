@@ -87,6 +87,7 @@ export default function Verifier() {
   } else {
     let icon: FontAwesomeIconProps["icon"];
     switch (comparatorResult.type) {
+      case "initial-load":
       case "in-preparation":
       case "in-progress":
       case "in-queue": {
