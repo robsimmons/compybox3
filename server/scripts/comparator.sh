@@ -6,16 +6,17 @@ PROJECT_DIR="$(realpath "$1")" # Read-only project source
 shift
 WORK_DIR="$(realpath "$1")"    # Task-specific temporary directory
 shift
-
-
+LANDRUN_ROOT="$(realpath "$1")"  # Where's Landrun?
+shift
 
 GIT_PATH=$(dirname $(realpath $(which git)))
 DIRNAME_PATH=$(dirname $(realpath $(which dirname)))
 WHICH_PATH=$(dirname $(realpath $(which which)))
 
+
 cd $PROJECT_DIR
 LEAN_ROOT="$(lean --print-prefix)"
-LANDRUN_ROOT=$(realpath "$HOME/landrun")
+
 
 SH=$(realpath $(which sh))
 SCRIPT=$(cat <<EOF

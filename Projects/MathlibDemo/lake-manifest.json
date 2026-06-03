@@ -19,10 +19,10 @@
       "type": "git",
       "subDir": null,
       "scope": "",
-      "rev": "8e9742116b5235d36018fa916dead534e0b9c058",
+      "rev": "1cfc5d8ad183bf65efe7accd0efc175b6b8f25b6",
       "name": "comparator",
       "manifestFile": "lake-manifest.json",
-      "inputRev": "specify-execs",
+      "inputRev": "v4.30.0",
       "inherited": false,
       "configFile": "lakefile.toml"
     },

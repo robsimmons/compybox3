@@ -51,39 +51,71 @@ lives in a directory `$PROJECT_DIR`, and each task is given its own temporary
 working directory `$WORK_DIR`. In parallel:
 
 - The challenge file is placed as `Challenge.lean` in an initially empty
-  `$WORK_DIR/Challenge`, and that directory is used as an overlay atom
+  `$WORK_DIR/Challenge`, and that directory is used as an overlay atop
   `$PROJECT_DIR` for compiling the challenge. Compilation is only able to
   write to `$WORK_DIR/Challenge/.lake/build`.
 - The candidate solution is placed as `Solution.lean` in an initially empty
   `$WORK_DIR/Solution`, and that directory is used as an overlay directory
-  atom `$SOLUTION_DIR` for compiling the solution. Compilation is only able to
+  atop `$PROJECT_DIR` for compiling the solution. Compilation is only able to
   write to `$WORK_DIR/Solution/.lake/build`.
 
 After this, the `challenge-thms` utility is run with an overlay setup of
-`$WORK_DIR/Challenge` -> `$PROJECT_DIR`  -> (temp dir to capture writes). Putting the challenge-thms utility
-on top helps ensure the integrity of the challenge-thms executable.
+`$WORK_DIR/Challenge` -> `$PROJECT_DIR` -> (temp dir to capture writes).
+Putting the `$PROJECT_DIR` on top helps ensure the integrity of the
+`challenge-thms` executable, which lives in `$PROJECT_DIR`.
 
 Finally, the `comparator` utility is run with an overlay setup of
-`$PROJECT_DIR` -> `$WORK_DIR/Solution` -> `$WORK_DIR/Challenge` -> (temp dir to capture writes). Placing the
-challenge on top in the overlay ensures that the process of compiling the
-solution cannot put `olean` files into place that would corrupt the challenge.
+`$PROJECT_DIR` -> `$WORK_DIR/Solution` -> `$WORK_DIR/Challenge` -> (temp dir
+to capture writes). Placing the challenge on top in the overlay ensures that
+the the solution cannot corrupt the challenge: any files written by the
+challenge compilation process will be visible regardless of what files the
+solution wrote.
 
-The command-line `comparator` tool will avoid recompiling the challenge and
-solution if they've already been compiled to olean by other means, so this
-workflow avoids repeated work.
+It's not necessary for `comparator` to have access to the compiled `.olean`
+files. We needed to compile the challenge ourselves anyway in order to get the
+list of relevant theorems, and comparator is designed to avoid recompiling the
+challenge and solution if they've already been compiled to olean by other
+means.
 
 ## Development mode setup
 
-Comparator Live can be run in development mode; the only dependencies are `lean` and `npm`.
+Comparator Live can be run in development mode; the only dependencies are
+`lean` and `npm`.
 
-1. Run `lake build` in the repository's `./Projects/MathlibDemo` directory
-2. Run `npm install` and then `npm run dev` in the repository's root
-   directory
+1. In the repository's `./Projects/MathlibDemo` directory, run
+   ```
+   lake build
+   lake build comparator
+   lake build lean4export
+   ```
+2. Run `npm install` and then `npm run dev` in the repository's root directory
 3. Go to `http://localhost/5173`
 
 ## Production mode setup
 
-TODO document better:
+In development mode, `comparator` and `lean4export` are dependencies of the
+project.
 
- - landrun is at $HOME/landrun/landrun
- - TODO change how project home is located
+In production mode, the correct version of comparator or lean4export needs to
+be _checked out_ and built in a subdirectory of each supported project, like
+this:
+
+```
+ - Projects/
+   - MathlibDemo/ (Lean v4.31.0-rc1)
+     - comparator/ (Lean v4.31.0-rc1 or higher)
+     - lean4export/ (Lean v4.31.0-rc1)
+   - mathlib-stable/ (Lean v4.30.0)
+     - comparator/ (Lean v4.30.0 or higher)
+     - lean4export/ (Lean v4.30.0)
+```
+
+Production mode expects the following environment variables set:
+
+- `PORT` (optional, defaults to 3000)
+- `NODE_ENV` set to `production`
+- `COMPARATOR_PROJECT_BASE_PATH` set to the `Projects` directory configured as
+  above
+- `LANDRUN_DIR` set to the directory where a comparator-compatible `LANDRUN`
+  (compiled from the main branch, as of mid-2026 the latest release is
+  insufficient)
